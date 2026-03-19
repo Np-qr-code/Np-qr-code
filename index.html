@@ -25,6 +25,7 @@
         .field { display: flex; flex-direction: column; gap: 4px; }
         label { font-size: 10px; font-weight: 700; color: var(--sub); text-transform: uppercase; }
         input { padding: 12px; border: 1px solid #d1d1d6; border-radius: 10px; font-size: 14px; outline: none; background: #f9f9fb; }
+        input:focus { border-color: var(--accent); background: #fff; }
         
         .btn-main { background: var(--primary); color: #fff; padding: 16px; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 10px; }
         .btn-print { background: #34c759; color: #fff; display: none; margin-top: 15px; width: 100%; padding: 16px; border-radius: 14px; border: none; font-weight: 700; }
@@ -39,7 +40,7 @@
         @media print {
             .no-print, nav, .container { display: none !important; }
             #print-zone { display: block; margin-top: 0; }
-            .label-style { display: flex !important; border: none !important; width: 1.5in !important; height: 1in !important; margin: 0; box-shadow: none; }
+            .label-style { display: flex !important; border: none !important; width: 1.5in !important; height: 1in !important; margin: 0; }
             @page { size: 1.5in 1in; margin: 0; }
         }
     </style>
@@ -47,10 +48,10 @@
 <body>
     <nav class="no-print">
         <div class="nav-container">
-            <div class="nav-item active" onclick="switchTab('emplacement', this)">Emplacement</div>
-            <div class="nav-item" onclick="switchTab('allee', this)">Allée</div>
-            <div class="nav-item" onclick="switchTab('badge', this)">Badge</div>
-            <div class="nav-item" onclick="switchTab('etoile', this)">Emplacement étoile</div>
+            <div class="nav-item active" id="nav-emp" onclick="switchTab('emplacement', this)">Emplacement</div>
+            <div class="nav-item" id="nav-allee" onclick="switchTab('allee', this)">Allée</div>
+            <div class="nav-item" id="nav-badge" onclick="switchTab('badge', this)">Badge</div>
+            <div class="nav-item" id="nav-etoile" onclick="switchTab('etoile', this)">Emplacement étoile</div>
         </div>
     </nav>
 
@@ -76,24 +77,34 @@
     <script>
         let currentTab = 'emplacement';
         let subMode = 'single';
+        const PIN_CODE = "2462"; // Ton code secret
 
         const forms = {
             emplacement: {
-                single: `<div class="grid"><div class="field"><label>Zone</label><input type="number" id="z" placeholder="10"></div><div class="field"><label>Allée</label><input type="number" id="a" placeholder="8"></div></div>
-                         <div class="grid"><div class="field"><label>Étagère</label><input type="text" id="etg" maxlength="1" placeholder="J"></div><div class="field"><label>Étage</label><input type="number" id="niv" placeholder="1"></div><div class="field"><label>Place</label><input type="text" id="pl" maxlength="1" placeholder="A"></div></div>`,
-                mass: `<div class="grid"><div class="field"><label>Zone</label><input type="number" id="z" placeholder="10"></div><div class="field"><label>Allée</label><input type="number" id="a" placeholder="8"></div></div>
-                       <div class="grid"><div class="field"><label>Étagère de</label><input type="text" id="etg_start" placeholder="A" maxlength="1"></div><div class="field"><label>à</label><input type="text" id="etg_end" placeholder="C" maxlength="1"></div></div>
-                       <div class="grid"><div class="field"><label>Nb Étages</label><input type="number" id="niv_max" placeholder="5"></div><div class="field"><label>Place de A à...</label><input type="text" id="pl_end" placeholder="B" maxlength="1"></div></div>`
+                single: `<div class="grid"><div class="field"><label>Zone</label><input type="number" id="z"></div><div class="field"><label>Allée</label><input type="number" id="a"></div></div>
+                         <div class="grid"><div class="field"><label>Étagère</label><input type="text" id="etg" maxlength="1"></div><div class="field"><label>Étage</label><input type="number" id="niv"></div><div class="field"><label>Place</label><input type="text" id="pl" maxlength="1"></div></div>`,
+                mass: `<div class="grid"><div class="field"><label>Zone</label><input type="number" id="z"></div><div class="field"><label>Allée</label><input type="number" id="a"></div></div>
+                       <div class="grid"><div class="field"><label>Étagère de</label><input type="text" id="etg_start" maxlength="1"></div><div class="field"><label>à</label><input type="text" id="etg_end" maxlength="1"></div></div>
+                       <div class="grid"><div class="field"><label>Nb Étages</label><input type="number" id="niv_max"></div><div class="field"><label>Place de A à...</label><input type="text" id="pl_end" maxlength="1"></div></div>`
             },
             allee: {
-                single: `<div class="grid"><div class="field"><label>Zone</label><input type="number" id="z" placeholder="5"></div><div class="field"><label>Allée</label><input type="number" id="a" placeholder="1"></div></div>`,
-                mass: `<div class="grid"><div class="field"><label>Zone</label><input type="number" id="z" placeholder="5"></div><div class="field"><label>Allées de</label><input type="number" id="a_start" placeholder="1"></div><div class="field"><label>à</label><input type="number" id="a_end" placeholder="12"></div></div>`
+                single: `<div class="grid"><div class="field"><label>Zone</label><input type="number" id="z"></div><div class="field"><label>Allée</label><input type="number" id="a"></div></div>`,
+                mass: `<div class="grid"><div class="field"><label>Zone</label><input type="number" id="z"></div><div class="field"><label>Allées de</label><input type="number" id="a_start"></div><div class="field"><label>à</label><input type="number" id="a_end"></div></div>`
             },
-            badge: `<div class="field" style="margin-bottom:10px;"><label>Nom Opérateur</label><input type="text" id="b_name" placeholder="KEVIN G."></div><div class="field"><label>N° Badge</label><input type="number" id="b_id" placeholder="2462"></div>`,
-            etoile: `<div class="field"><label>Code à encoder</label><input type="text" id="star_code" placeholder="TEXTE LIBRE"></div>`
+            badge: `<div class="field" style="margin-bottom:10px;"><label>Nom Opérateur</label><input type="text" id="b_name"></div><div class="field"><label>N° Badge (4 chiffres)</label><input type="number" id="b_id"></div>`,
+            etoile: `<div class="field"><label>Code à encoder</label><input type="text" id="star_code"></div>`
         };
 
         function switchTab(tab, el) {
+            // Sécurité pour l'onglet étoile
+            if (tab === 'etoile') {
+                const inputPin = prompt("Veuillez saisir le code PIN pour accéder à cette fonction :");
+                if (inputPin !== PIN_CODE) {
+                    alert("Code PIN incorrect. Accès refusé.");
+                    return; // Arrête la fonction ici
+                }
+            }
+
             currentTab = tab;
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
@@ -126,13 +137,15 @@
 
             if (currentTab === 'emplacement') {
                 if (subMode === 'single') {
-                    tasks.push({ z: document.getElementById('z').value, a: document.getElementById('a').value, etg: document.getElementById('etg').value.toUpperCase(), niv: document.getElementById('niv').value, pl: document.getElementById('pl').value.toUpperCase() });
+                    const z = document.getElementById('z').value, a = document.getElementById('a').value, etg = document.getElementById('etg').value.toUpperCase(), niv = document.getElementById('niv').value, pl = document.getElementById('pl').value.toUpperCase();
+                    if(!z || !a || !etg || !niv || !pl) return alert("Champs vides !");
+                    tasks.push({ z, a, etg, niv, pl });
                 } else {
                     const z = document.getElementById('z').value, a = document.getElementById('a').value;
-                    const s = document.getElementById('etg_start').value.toUpperCase().charCodeAt(0);
-                    const e = document.getElementById('etg_end').value.toUpperCase().charCodeAt(0);
-                    const nMax = parseInt(document.getElementById('niv_max').value);
-                    const pMax = document.getElementById('pl_end').value.toUpperCase().charCodeAt(0);
+                    const es = document.getElementById('etg_start').value, ee = document.getElementById('etg_end').value;
+                    const nMax = parseInt(document.getElementById('niv_max').value), pe = document.getElementById('pl_end').value;
+                    if(!z || !a || !es || !ee || isNaN(nMax) || !pe) return alert("Champs vides !");
+                    const s = es.toUpperCase().charCodeAt(0), e = ee.toUpperCase().charCodeAt(0), pMax = pe.toUpperCase().charCodeAt(0);
                     for (let ie = s; ie <= e; ie++) {
                         for (let iniv = 1; iniv <= nMax; iniv++) {
                             for (let ip = 65; ip <= pMax; ip++) {
@@ -154,9 +167,13 @@
             } 
             else if (currentTab === 'allee') {
                 let list = [];
-                if (subMode === 'single') list.push({z: document.getElementById('z').value, a: document.getElementById('a').value});
-                else {
+                if (subMode === 'single') {
+                    const z = document.getElementById('z').value, a = document.getElementById('a').value;
+                    if(!z || !a) return alert("Champs vides !");
+                    list.push({z, a});
+                } else {
                     const z = document.getElementById('z').value, start = parseInt(document.getElementById('a_start').value), end = parseInt(document.getElementById('a_end').value);
+                    if(!z || isNaN(start) || isNaN(end)) return alert("Champs vides !");
                     for(let i=start; i<=end; i++) list.push({z, a: i});
                 }
                 for (let i=0; i < list.length; i++) {
@@ -174,6 +191,7 @@
             }
             else if (currentTab === 'badge') {
                 const n = document.getElementById('b_name').value, id = document.getElementById('b_id').value;
+                if(!n || !id) return alert("Champs vides !");
                 const full = "20320000" + ("000"+id).slice(-4);
                 const code = full + getCheckDigit(full);
                 let div = document.createElement('div'); div.className = 'label-style';
@@ -183,6 +201,7 @@
             }
             else if (currentTab === 'etoile') {
                 const sc = document.getElementById('star_code').value;
+                if(!sc) return alert("Champs vides !");
                 let div = document.createElement('div'); div.className = 'label-style';
                 div.innerHTML = `<div class="bc-box" style="height:1in;"><canvas id="c-star"></canvas></div>`;
                 pz.appendChild(div);
