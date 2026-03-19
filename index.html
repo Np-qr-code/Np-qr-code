@@ -2,87 +2,277 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Générateur Officiel Emplacements</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur d'Étiquettes Pharma Pro v3.0</title>
     <script src="https://cdn.jsdelivr.net/npm/bwip-js@3.0.4/dist/bwip-js-min.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .config { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; width: 400px; }
-        .row { display: flex; gap: 10px; margin-bottom: 10px; }
-        input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
-        button { width: 100%; padding: 12px; background: #000; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        
-        /* Format Étiquette 1.5x1.0 */
-        #label {
-            width: 380px; height: 250px; background: white; border: 1px solid #000;
-            display: flex; padding: 15px; box-sizing: border-box; position: relative;
+        :root {
+            --primary-color: #333;
+            --accent-color: #007bff;
+            --bg-color: #f7f9fc;
+            --card-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        .left { flex: 1; display: flex; flex-direction: column; justify-content: center; font-weight: bold; font-size: 55px; }
-        .center { flex: 2; display: flex; align-items: center; justify-content: center; font-size: 100px; font-weight: bold; }
-        .right { flex: 1.5; display: flex; align-items: center; justify-content: center; }
-        canvas { max-width: 100%; max-height: 100%; }
-        .debug { font-size: 10px; color: red; position: absolute; bottom: 5px; right: 5px; }
+
+        /* --- STYLES ÉCRAN (Uniquement pour le formulaire et le fond) --- */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: var(--bg-color); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 30px; 
+            margin: 0; 
+            color: #333;
+        }
+
+        h1 { margin-top: 0; font-size: 1.5em; text-align: center; color: var(--primary-color); margin-bottom: 25px;}
+
+        /* Formulaire de configuration */
+        .config-card { 
+            background: white; 
+            padding: 25px; 
+            border-radius: 15px; 
+            box-shadow: var(--card-shadow); 
+            margin-bottom: 30px; 
+            width: 100%;
+            max-width: 480px; 
+            box-sizing: border-box;
+            border-top: 5px solid var(--primary-color);
+        }
+        
+        .row { display: flex; gap: 12px; margin-bottom: 12px; }
+        .row:last-child { margin-bottom: 0; }
+        
+        .form-group { flex: 1; display: flex; flex-direction: column; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.85em; color: #666; }
+        
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid #ddd; 
+            border-radius: 8px; 
+            font-size: 1em; 
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        input:focus { border-color: var(--primary-color); outline: none; }
+        
+        button.generate-btn { 
+            width: 100%; 
+            padding: 15px; 
+            background: var(--primary-color); 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 1.1em; 
+            transition: background 0.2s, transform 0.1s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        button.generate-btn:hover { background: #111; }
+        button.generate-btn:active { transform: scale(0.98); }
+
+        /* Titre de prévisualisation */
+        .preview-title { font-size: 1.1em; color: #7f8c8d; margin-bottom: 10px; font-weight: 600; }
+
+        /* --- STYLES DE L'ÉTQUETTE (Visible à l'écran avec contour) --- */
+        #label {
+            width: 380px; /* Taille écran zoomée (x100) */
+            height: 250px; 
+            background: white; 
+            border: 1px solid #000; /* Contour fin pour l'écran */
+            display: flex; 
+            padding: 15px; 
+            box-sizing: border-box; 
+            position: relative;
+            color: black;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Zones de l'étiquette */
+        .label-left { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: flex-start;
+            padding-right: 15px;
+            border-right: 1px dashed #f0f0f0; /* Ligne discrète */
+        }
+        .loc-main-z-a { font-size: 20px; color: #555; margin-bottom: 10px; }
+        .loc-main-z-a b { color: black; font-weight: bold; font-size: 26px; }
+
+        .label-center { 
+            flex: 2; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center; 
+            position: relative;
+        }
+        .loc-main-rack { font-size: 100px; font-weight: bold; line-height: 1; margin: 0; }
+        .placement-label { position: absolute; bottom: 10px; font-size: 10px; text-transform: uppercase; color: #999; letter-spacing: 1px;}
+
+        .label-right { 
+            flex: 1.5; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: white;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        /* Zone DataMatrix Certifié Forcé (ECC200) */
+        .barcode-area {
+            width: 140px; height: 140px; background: #fff; padding: 15px; /* Quiet Zone Cruciale */
+            box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 1px solid #eee;
+        }
+        canvas { max-width: 100% !important; max-height: 100% !important; object-fit: contain; }
+
+        /* Infos de debug sous l'étiquette (uniquement sur écran) */
+        .debug-info { margin-top: 20px; font-size: 12px; color: #e67e22; font-family: monospace; background: #fff3e0; padding: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+        /* --- STYLES STRICTS POUR L'IMPRESSION (@media print) --- */
+        @media print {
+            /* 1. Cacher tout le reste de la page */
+            body { background: white; padding: 0; margin: 0; display: block; visibility: hidden; }
+            h1, .config-card, .preview-title, .debug-info { display: none !important; visibility: hidden !important; }
+
+            /* 2. Afficher UNIQUEMENT l'étiquette */
+            #label {
+                display: flex !important;
+                visibility: visible;
+                position: absolute;
+                left: 0; top: 0;
+                border: none; /* Enlever le contour pour l'impression */
+                box-shadow: none;
+                
+                /* 3. Forcer la taille réelle (1.5x1.0 pouces) */
+                width: 1.50in; 
+                height: 1.00in;
+                padding: 0; /* Réduire les marges internes pour la taille réelle */
+                overflow: hidden;
+            }
+
+            /* 4. Redimensionner le texte pour l'impression réelle (en pt) */
+            .loc-main-z-a { font-size: 7pt; margin-bottom: 0.05in; }
+            .loc-main-z-a b { font-size: 8pt; }
+            .loc-main-rack { font-size: 36pt; }
+            .placement-label { font-size: 4pt; bottom: 0.05in; }
+            
+            /* DataMatrix à l'impression */
+            .label-right { padding: 0.05in; }
+            .barcode-area { width: 0.9in; height: 0.9in; padding: 0.05in; border: none;}
+        }
     </style>
 </head>
 <body>
 
-    <div class="config">
-        <div class="row">
-            <input type="number" id="area" value="10" placeholder="Zone">
-            <input type="number" id="room" value="8" placeholder="Allée">
-        </div>
-        <div class="row">
-            <input type="text" id="rack" value="J" placeholder="Étagère">
-            <input type="number" id="shelf" value="8" placeholder="Étage">
-            <input type="text" id="bin" value="B" placeholder="Place">
-        </div>
-        <button onclick="generate()">GÉNÉRER L'ÉTIQUETTE</button>
+    <h1>Générateur d'Étiquettes Pharma</h1>
+
+    <div class="config-card">
+        <h2>Configuration Officielle</h2>
+        <form onsubmit="updateLabel(); return false;">
+            <div class="row">
+                <div class="form-group">
+                    <label for="z">Zone</label>
+                    <input type="number" id="z" value="10" placeholder="Zone">
+                </div>
+                <div class="form-group">
+                    <label for="a">Allée</label>
+                    <input type="number" id="a" value="8" placeholder="Allée">
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label for="etg">Étagère</label>
+                    <input type="text" id="etg" value="J" placeholder="C" maxlength="1">
+                </div>
+                <div class="form-group">
+                    <label for="niv">Étage</label>
+                    <input type="number" id="niv" value="8" placeholder="1">
+                </div>
+                <div class="form-group">
+                    <label for="pl">Place</label>
+                    <input type="text" id="pl" value="B" placeholder="A" maxlength="1">
+                </div>
+            </div>
+            <button class="generate-btn" type="button" onclick="updateLabel()">
+                Générer l'Étiquette
+            </button>
+        </form>
     </div>
 
+    <div class="preview-title">Prévisualisation (x10)</div>
     <div id="label">
-        <div class="left">
-            <div id="dispZ">10</div>
-            <div id="dispA">8</div>
+        <div class="label-left">
+            <div class="loc-main-z-a">Z <b><span id="dispZ">10</span></b></div>
+            <div class="loc-main-z-a">A <b><span id="dispA">8</span></b></div>
         </div>
-        <div class="center" id="dispM">J8B</div>
-        <div class="right">
-            <canvas id="canvas"></canvas>
+        
+        <div class="label-center">
+            <p class="loc-main-rack" id="dispCode">J8B</p>
+            <p class="placement-label">Emplacement</p>
         </div>
-        <div class="debug" id="dispCode"></div>
+
+        <div class="label-right">
+            <div class="barcode-area">
+                <canvas id="canvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="debug-info">
+        Code secret encodé (Format EAN13) : <span id="debugQR"></span>
     </div>
 
     <script>
-        function generate() {
-            // Récupération des valeurs
-            const area = document.getElementById('area').value;
-            const room = document.getElementById('room').value;
-            const rack = document.getElementById('rack').value.toUpperCase();
-            const shelf = document.getElementById('shelf').value;
-            const bin = document.getElementById('bin').value.toUpperCase();
+        function updateLabel() {
+            // Récupération et nettoyage des valeurs
+            const z = document.getElementById('z').value.trim();
+            const a = document.getElementById('a').value.trim();
+            const etg = document.getElementById('etg').value.trim().toUpperCase();
+            const niv = document.getElementById('niv').value.trim();
+            const pl = document.getElementById('pl').value.trim().toUpperCase();
 
-            // --- LA FORMULE MAGIQUE DE TON TRAVAIL ---
-            // On calcule le code numérique secret
-            var code = parseInt((area == '0' ? '2030' : '21' + ('0' + area).slice(-2)) + '00000000')
-                     + (parseInt(room) * 1000000)
-                     + (rack.charCodeAt(0) - 'A'.charCodeAt(0) + 1) * 10000
-                     + (parseInt(shelf) * 100)
-                     + (bin.charCodeAt(0) - 'A'.charCodeAt(0) + 1);
+            // Construction du code d'emplacement complet (ex: C1A)
+            const humanCode = etg + niv + pl;
+            
+            // --- LA FORMULE MAGIQUE DE TON TRAVAIL (Certifiée) ---
+            // On recalcule le code numérique secret (Format EAN13)
+            var code = parseInt((z == '0' ? '2030' : '21' + ('0' + z).slice(-2)) + '00000000')
+                     + (parseInt(a) * 1000000)
+                     + (etg.charCodeAt(0) - 'A'.charCodeAt(0) + 1) * 10000
+                     + (parseInt(niv) * 100)
+                     + (pl.charCodeAt(0) - 'A'.charCodeAt(0) + 1);
 
-            // Mise à jour visuelle
-            document.getElementById('dispZ').innerText = area;
-            document.getElementById('dispA').innerText = room;
-            document.getElementById('dispM').innerText = rack + shelf + bin;
-            document.getElementById('dispCode').innerText = "Encodé: " + code;
+            // Mise à jour visuelle du texte sur l'étiquette
+            document.getElementById('dispZ').innerText = z;
+            document.getElementById('dispA').innerText = a;
+            document.getElementById('dispCode').innerText = humanCode;
+            document.getElementById('debugQR').innerText = code;
 
-            // Génération du Data Matrix avec le code numérique
-            bwipjs.toCanvas('canvas', {
-                bcid: 'datamatrix',
-                text: code.toString(), // On encode le NOMBRE, pas le texte !
-                scale: 5,
-                includetext: false,
-                datamatrixsize: '18x18' // Format carré conforme
-            });
+            // Génération du Data Matrix Industriel (ECC200)
+            try {
+                bwipjs.toCanvas('canvas', {
+                    bcid: 'datamatrix',    // Type de code (Data Matrix)
+                    text: code.toString(),  // On encode le NOMBREsecret, pas le texte !
+                    scale: 6,              // Résolution haute
+                    includetext: false,    // Pas de texte sous le code
+                    rowheight: 0,          // Ratio carré
+                    // Paramètres critiques pour la conformité :
+                    padding: 4,            // Quiet Zone modules
+                    datamatrixsize: '18x18' // Force la taille de la grille pour la ressemblance
+                });
+            } catch (e) {
+                console.error("Erreur de génération : ", e);
+                alert("Erreur lors de la génération. Vérifiez vos saisies.");
+            }
         }
-        window.onload = generate;
+
+        // Initialisation automatique au chargement
+        window.onload = updateLabel;
     </script>
 </body>
 </html>
