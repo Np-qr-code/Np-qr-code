@@ -3,55 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Générateur Étiquette Pharma</title>
+    <title>Générateur Étiquette Pharma - Centré v2</title>
     <script src="https://cdn.jsdelivr.net/npm/bwip-js@3.0.4/dist/bwip-js-min.js"></script>
     <style>
-        /* --- STYLE POUR L'ÉCRAN --- */
-        body { font-family: sans-serif; background: #f4f7f6; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .no-print { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; width: 100%; max-width: 400px; }
-        .row { display: flex; gap: 10px; margin-bottom: 10px; }
+        /* --- STYLE ÉCRAN (Formulaire uniquement) --- */
+        body { font-family: sans-serif; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
+        .no-print { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; width: 100%; max-width: 400px; box-sizing: border-box;}
+        .row { display: flex; gap: 8px; margin-bottom: 10px; }
         input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; box-sizing: border-box; }
+        label { display: block; font-size: 11px; color: #666; margin-bottom: 3px; font-weight: bold;}
         
-        button { 
-            width: 100%; padding: 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; 
-        }
+        button { width: 100%; padding: 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 5px; font-size: 16px; transition: background 0.2s;}
         .btn-gen { background: #000; color: white; }
-        .btn-print { background: #27ae60; color: white; margin-top: 5px; }
+        .btn-gen:hover { background: #333; }
+        .btn-print { background: #27ae60; color: white; }
+        .btn-print:hover { background: #2ecc71; }
 
-        /* --- L'ÉTQUETTE (Visible sur écran) --- */
+        /* --- L'ÉTQUETTE CENTRÉE (Visible sur écran) --- */
         #label-to-print {
-            width: 1.5in; height: 1in; /* Taille réelle */
-            background: white; border: 1px solid #ddd;
-            display: flex; padding: 0.1in; box-sizing: border-box;
-            color: black;
+            /* Taille réelle de 1.5x1.0 pouce */
+            width: 1.5in; 
+            height: 1in; 
+            background: white; 
+            border: 1px solid #ccc; /* Contour fin pour l'écran */
+            color: black; 
+            overflow: hidden; /* Sécurité : rien ne dépasse */
+            position: relative;
+            
+            /* --- CENTRAGE TOTAL --- */
+            display: flex;
+            flex-direction: column; /* Tout en colonne */
+            justify-content: center; /* Centré verticalement */
+            align-items: center; /* Centré horizontalement */
+            padding: 0; /* Marges gérées par les éléments internes */
         }
-        .label-left { flex: 1; display: flex; flex-direction: column; justify-content: center; font-size: 8pt; font-weight: bold; }
-        .label-center { flex: 2; display: flex; align-items: center; justify-content: center; font-size: 32pt; font-weight: bold; }
-        .label-right { flex: 1.5; display: flex; align-items: center; justify-content: center; }
-        canvas { width: 100%; height: auto; }
+
+        /* Conteneur DataMatrix GÉANT MAIS DANS LE CADRE */
+        .barcode-area {
+            width: 100%; /* Prend toute la largeur */
+            height: 0.7in; /* Occupe 70% de la hauteur */
+            display: flex;
+            align-items: center; /* Centré verticalement dans sa zone */
+            justify-content: center; /* Centré horizontalement */
+            margin-top: 0.05in; /* Petite marge en haut */
+            overflow: hidden;
+        }
+
+        /* Le Canvas du Data Matrix */
+        canvas { 
+            /* TAILLE MAXIMALE FORCÉE SANS DÉPASSER */
+            height: 0.7in !important; /* Forcé à la hauteur de sa zone */
+            max-width: 100% !important; /* Sécurité largeur */
+            image-rendering: pixelated; /* Points nets */
+            display: block; /* Évite les décalages de ligne */
+        }
+
+        /* Zone de texte (En dessous, Centrée) */
+        .text-area { 
+            width: 100%; /* Prend toute la largeur */
+            height: 0.3in; /* Occupe le reste de la hauteur (30%) */
+            display: flex; 
+            align-items: center; /* Centré verticalement dans sa zone */
+            justify-content: center; /* Centré horizontalement */
+            font-size: 14pt; /* Taille du texte lisible (ajustée pour 1.5x1in) */
+            font-weight: bold; 
+            letter-spacing: 0.5px; /* Espacement léger */
+            padding-bottom: 0.05in; /* Petite marge en bas */
+        }
 
         /* --- CONFIGURATION STRICTE IMPRESSION --- */
         @media print {
-            /* On cache TOUT ce qui a la classe "no-print" */
-            .no-print, title, header, footer { display: none !important; }
-            
+            .no-print { display: none !important; }
             body { background: white; padding: 0; margin: 0; }
-            
-            /* On force l'étiquette à être seule en haut à gauche */
             #label-to-print {
-                position: fixed;
-                top: 0; left: 0;
-                border: none !important;
-                width: 1.5in !important;
+                position: fixed; 
+                top: 0; 
+                left: 0; 
+                border: none !important; /* Enlever le contour à l'impression */
+                width: 1.5in !important; 
                 height: 1in !important;
-                display: flex !important;
-                visibility: visible !important;
+                box-shadow: none;
             }
-            
-            /* Réglage de la page d'impression */
-            @page {
-                size: 1.5in 1in;
-                margin: 0;
+            @page { 
+                size: 1.5in 1in; 
+                margin: 0; 
             }
         }
     </style>
@@ -59,54 +94,74 @@
 <body>
 
     <div class="no-print">
+        <h3 style="margin-top:0; text-align:center;">Générateur Étiquette Pharma</h3>
         <div class="row">
-            <input type="number" id="z" value="10" placeholder="Zone">
-            <input type="number" id="a" value="8" placeholder="Allée">
+            <div style="flex:1"><label>Zone</label><input type="number" id="z" value="10" placeholder="10"></div>
+            <div style="flex:1"><label>Allée</label><input type="number" id="a" value="8" placeholder="8"></div>
         </div>
         <div class="row">
-            <input type="text" id="etg" value="J" maxlength="1">
-            <input type="number" id="niv" value="8">
-            <input type="text" id="pl" value="B" maxlength="1">
+            <div style="flex:1"><label>Étager.</label><input type="text" id="etg" value="J" maxlength="1" placeholder="J"></div>
+            <div style="flex:1"><label>Étage</label><input type="number" id="niv" value="8" placeholder="8"></div>
+            <div style="flex:1"><label>Place</label><input type="text" id="pl" value="B" maxlength="1" placeholder="B"></div>
         </div>
-        <button class="btn-gen" onclick="update()">Mettre à jour</button>
+        <button class="btn-gen" onclick="update()">METTRE À JOUR</button>
         <button class="btn-print" onclick="window.print()">IMPRIMER L'ÉTIQUETTE</button>
     </div>
 
     <div id="label-to-print">
-        <div class="label-left">
-            <div>Z <span id="resZ">10</span></div>
-            <div>A <span id="resA">8</span></div>
-        </div>
-        <div class="label-center" id="resM">J8B</div>
-        <div class="label-right">
+        
+        <div class="barcode-area">
             <canvas id="canvas"></canvas>
         </div>
+        
+        <div class="text-area">
+            <span id="resText">10-8J8B</span>
+        </div>
+        
     </div>
 
     <script>
         function update() {
-            const z = document.getElementById('z').value;
-            const a = document.getElementById('a').value;
-            const etg = document.getElementById('etg').value.toUpperCase();
-            const niv = document.getElementById('niv').value;
-            const pl = document.getElementById('pl').value.toUpperCase();
+            // Récupération des valeurs
+            const z = document.getElementById('z').value.trim();
+            const a = document.getElementById('a').value.trim();
+            const etg = document.getElementById('etg').value.trim().toUpperCase();
+            const niv = document.getElementById('niv').value.trim();
+            const pl = document.getElementById('pl').value.trim().toUpperCase();
 
-            const codeStr = etg + niv + pl;
-            // Formule mathématique de ton travail
-            var encoded = parseInt((z == '0' ? '2030' : '21' + ('0' + z).slice(-2)) + '00000000')
-                     + (parseInt(a) * 1000000) + (etg.charCodeAt(0) - 64) * 10000 + (parseInt(niv) * 100) + (pl.charCodeAt(0) - 64);
+            // Construction du texte humain complet (ex: 10-8J8B)
+            const humanText = z + "-" + a + etg + niv + pl;
+            
+            // --- LA FORMULE MAGIQUE DE TON TRAVAIL (Certifiée) ---
+            // On recalcule le code numérique secret (Format EAN13)
+            var code = parseInt((z == '0' ? '2030' : '21' + ('0' + z).slice(-2)) + '00000000')
+                     + (parseInt(a) * 1000000)
+                     + (etg.charCodeAt(0) - 'A'.charCodeAt(0) + 1) * 10000
+                     + (parseInt(niv) * 100)
+                     + (pl.charCodeAt(0) - 'A'.charCodeAt(0) + 1);
 
-            document.getElementById('resZ').innerText = z;
-            document.getElementById('resA').innerText = a;
-            document.getElementById('resM').innerText = codeStr;
+            // Mise à jour visuelle du texte sur l'étiquette
+            document.getElementById('resText').innerText = humanText;
 
-            bwipjs.toCanvas('canvas', {
-                bcid: 'datamatrix',
-                text: encoded.toString(),
-                scale: 4,
-                datamatrixsize: '18x18'
-            });
+            // Génération du DataMatrix Industriel (ECC200)
+            try {
+                bwipjs.toCanvas('canvas', {
+                    bcid: 'datamatrix',    // Type de code (Data Matrix)
+                    text: code.toString(),  // On encode le NOMBRE secret, pas le texte !
+                    scale: 10,             // Échelle très haute (pour la taille maximale)
+                    includetext: false,    // Pas de texte sous le code
+                    rowheight: 0,          // Force le ratio carré
+                    // Paramètres critiques pour la conformité et la sécurité :
+                    padding: 4,            // Quiet Zone modules (Marge blanche critique autour du code)
+                    datamatrixsize: '18x18' // Force la taille de la grille pour la ressemblance
+                });
+            } catch (e) {
+                console.error("Erreur de génération : ", e);
+                alert("Erreur lors de la génération. Vérifiez vos saisies.");
+            }
         }
+
+        // Initialisation automatique au chargement
         window.onload = update;
     </script>
 </body>
