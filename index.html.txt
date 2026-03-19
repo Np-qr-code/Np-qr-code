@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur d'Étiquettes d'Emplacement Pro - Data Matrix Géant</title>
+    <script src="https://cdn.jsdelivr.net/npm/bwip-js@3.0.4/dist/bwip-js-min.js"></script>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --background-color: #ecf0f1;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: var(--background-color); 
+            padding: 20px; 
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 { color: var(--secondary-color); margin-bottom: 20px; font-size: 1.4em; text-align: center;}
+
+        /* --- Zone de Contrôle / Formulaire (Jolie) --- */
+        .controls { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: var(--shadow); 
+            margin-bottom: 20px; 
+            width: 100%;
+            max-width: 450px; 
+            box-sizing: border-box;
+        }
+        
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; margin-bottom: 4px; color: #555; font-weight: 600; font-size: 0.85em;}
+        .controls input[type="text"] { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            box-sizing: border-box; 
+            font-size: 0.95em;
+            transition: border-color 0.2s;
+        }
+        .controls input[type="text"]:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .input-row { display: flex; gap: 8px; }
+        .input-row .form-group { flex: 1; }
+
+        .btn-update { 
+            width: 100%; 
+            padding: 12px; 
+            background: var(--primary-color); 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 1em; 
+            font-weight: bold; 
+            transition: background 0.2s;
+        }
+        .btn-update:hover { background: #2980b9; }
+        
+        .print-info { font-size: 11px; color: #7f8c8d; text-align: center; margin-top: 12px; }
+
+        /* --- Zone de Prévisualisation (Jolie) --- */
+        .preview-container {
+            border: 1px solid #bdc3c7;
+            background: #fff;
+            padding: 8px;
+            border-radius: 6px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+        .preview-title { font-size: 11px; color: #7f8c8d; text-align: center; margin-bottom: 4px; }
+
+        /* Format de l'étiquette (1.50" x 1.00" approx 38mm x 25mm) à l'écran (zoom x10) */
+        #label-preview {
+            width: 380px; 
+            height: 250px; 
+            background: white;
+            display: flex;
+            position: relative;
+            padding: 8px; /* Réduit pour maximiser l'espace */
+            box-sizing: border-box;
+            color: black;
+            border: 1px solid #333; 
+        }
+
+        /* --- Nouvelle structure de l'étiquette --- */
+        .label-left {
+            flex: 1; /* Prend la première moitié */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 120px; /* C1A complet */
+            color: #111;
+            line-height: 1;
+        }
+
+        .label-right {
+            flex: 1; /* Prend la deuxième moitié */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-left: 8px;
+            border-left: 1px solid #eee; /* Optionnel : ligne de séparation discrète */
+        }
+
+        /* Titre "Zone / Allée" */
+        .zone-info {
+            font-size: 18px;
+            text-transform: uppercase;
+            color: #777;
+            letter-spacing: 0.5px;
+            line-height: 1.2;
+            text-align: right;
+            margin-bottom: 5px;
+        }
+        .zone-info b { color: black; font-weight: bold; }
+
+        /* Zone du Data Matrix Géant */
+        .barcode-area {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; /* Empêche le code de déborder */
+        }
+        
+        canvas { 
+            max-width: 100%; 
+            max-height: 100%;
+            object-fit: contain; /* S'assure que le code remplit l'espace sans se déformer */
+        }
+
+        .operator-name { 
+            font-size: 14px; 
+            font-style: italic; 
+            color: #555; 
+            margin-top: 5px;
+        }
+
+        /* --- RÈGLES POUR L'IMPRESSION (Strictes) --- */
+        @media print {
+            body { background: white; padding: 0; }
+            h1, .controls, .preview-title, .preview-container { display: none !important; }
+            
+            #label-preview { 
+                display: flex !important;
+                visibility: visible;
+                position: absolute; 
+                left: 0; 
+                top: 0; 
+                border: none; 
+                padding: 0; 
+                margin: 0;
+                width: 1.50in;  /* Forcer la taille réelle */
+                height: 1.00in;
+                overflow: hidden;
+            }
+
+            /* Redimensionner le texte pour l'impression réelle */
+            .label-left { font-size: 38pt; }
+            .zone-info { font-size: 6pt; }
+            .zone-info b { font-size: 7pt; }
+            .operator-name { font-size: 5pt; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Gestionnaire d'Étiquettes d'Emplacement</h1>
+
+    <div class="controls">
+        <form onsubmit="return false;">
+            <div class="input-row">
+                <div class="form-group">
+                    <label for="zoneNum">Zone</label>
+                    <input type="text" id="zoneNum" value="12" maxlength="3">
+                </div>
+                <div class="form-group">
+                    <label for="alleeNum">Allée</label>
+                    <input type="text" id="alleeNum" value="26" maxlength="3">
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="form-group">
+                    <label for="etagereChar">Étagère</label>
+                    <input type="text" id="etagereChar" value="C" maxlength="1">
+                </div>
+                <div class="form-group">
+                    <label for="etageNum">Étage</label>
+                    <input type="text" id="etageNum" value="1" maxlength="2">
+                </div>
+                <div class="form-group">
+                    <label for="emplacementChar">Place</label>
+                    <input type="text" id="emplacementChar" value="A" maxlength="1">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="operator">Opérateur</label>
+                <input type="text" id="operator" value="Kevin G.">
+            </div>
+
+            <button class="btn-update" onclick="updateLabel()">Générer/Mettre à jour</button>
+        </form>
+        <p class="print-info">Prévisualisation (x10). Utilisez Ctrl+P pour imprimer à 1.5x1 pouce.</p>
+    </div>
+
+    <div class="preview-title">Prévisualisation de l'étiquette :</div>
+    <div class="preview-container">
+        <div id="label-preview">
+            <div class="label-left" id="displayCode">C1A</div>
+
+            <div class="label-right">
+                <div class="zone-info">
+                    Zone <b><span id="displayZone">12</span></b><br>
+                    Allée <b><span id="displayAllee">26</span></b>
+                </div>
+                <div class="barcode-area">
+                    <canvas id="barcodeCanvas"></canvas>
+                </div>
+                <div class="operator-name" id="displayOp">Kevin G.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateLabel() {
+            // Récupération et nettoyage des valeurs
+            const zone = document.getElementById('zoneNum').value.trim();
+            const allee = document.getElementById('alleeNum').value.trim();
+            const etagere = document.getElementById('etagereChar').value.trim().toUpperCase();
+            const etage = document.getElementById('etageNum').value.trim();
+            const emplacement = document.getElementById('emplacementChar').value.trim().toUpperCase();
+            const op = document.getElementById('operator').value.trim();
+
+            // Construction du code complet (ex: C1A)
+            const fullCode = etagere + etage + emplacement;
+
+            // Mise à jour du texte
+            document.getElementById('displayZone').innerText = zone;
+            document.getElementById('displayAllee').innerText = allee;
+            document.getElementById('displayCode').innerText = fullCode;
+            document.getElementById('displayOp').innerText = op;
+
+            // Génération du Data Matrix
+            try {
+                // IMPORTANT : Échelle augmentée à 5 pour l'écran pour qu'il remplisse l'espace
+                bwipjs.toCanvas('barcodeCanvas', {
+                    bcid: 'datamatrix',       
+                    text: fullCode,           
+                    scale: 5,                 
+                    includetext: false,       
+                });
+            } catch (e) {
+                console.error(e);
+                alert("Erreur lors de la génération du Data Matrix. Vérifiez vos saisies.");
+            }
+        }
+
+        // Initialisation automatique au chargement
+        window.onload = updateLabel;
+    </script>
+</body>
+</html>
