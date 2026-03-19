@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur d'Étiquettes d'Emplacement Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/bwip-js@3.0.4/dist/bwip-js-min.js"></script>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --background-color: #ecf0f1;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+```
+    body { 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        background: var(--background-color); 
+        padding: 20px; 
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    h1 { color: var(--secondary-color); margin-bottom: 20px; font-size: 1.4em; text-align: center;}
+
+    .controls { 
+        background: white; 
+        padding: 20px; 
+        border-radius: 12px; 
+        box-shadow: var(--shadow); 
+        margin-bottom: 20px; 
+        width: 100%;
+        max-width: 450px; 
+        box-sizing: border-box;
+    }
+    
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; margin-bottom: 4px; color: #555; font-weight: 600; font-size: 0.85em;}
+    .controls input[type="text"] { 
+        width: 100%; 
+        padding: 10px; 
+        border: 1px solid #ddd; 
+        border-radius: 6px; 
+        box-sizing: border-box; 
+        font-size: 0.95em;
+        transition: border-color 0.2s;
+    }
+    .controls input[type="text"]:focus {
+        border-color: var(--primary-color);
+        outline: none;
+    }
+
+    .input-row { display: flex; gap: 8px; }
+    .input-row .form-group { flex: 1; }
+
+    .btn-update { 
+        width: 100%; 
+        padding: 12px; 
+        background: var(--primary-color); 
+        color: white; 
+        border: none; 
+        border-radius: 6px; 
+        cursor: pointer; 
+        font-size: 1em; 
+        font-weight: bold; 
+        transition: background 0.2s;
+        margin-bottom: 8px;
+    }
+    .btn-update:hover { background: #2980b9; }
+
+    .btn-print {
+        width: 100%;
+        padding: 12px;
+        background: #27ae60;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1em;
+        font-weight: bold;
+        transition: background 0.2s;
+    }
+    .btn-print:hover { background: #219a52; }
+    
+    .print-info { font-size: 11px; color: #7f8c8d; text-align: center; margin-top: 12px; }
+
+    .encoded-value {
+        font-size: 11px;
+        color: #27ae60;
+        text-align: center;
+        margin-top: 8px;
+        font-family: monospace;
+        background: #f0fff4;
+        padding: 4px 8px;
+        border-radius: 4px;
+        border: 1px solid #a8e6c0;
+        word-break: break-all;
+    }
+
+    .preview-container {
+        border: 1px solid #bdc3c7;
+        background: #fff;
+        padding: 8px;
+        border-radius: 6px;
+        box-shadow: var(--shadow);
+        margin-bottom: 20px;
+    }
+    .preview-title { font-size: 11px; color: #7f8c8d; text-align: center; margin-bottom: 8px; }
+
+    #label-preview {
+        width: 380px; 
+        height: 250px; 
+        background: white;
+        display: flex;
+        position: relative;
+        padding: 10px;
+        box-sizing: border-box;
+        color: black;
+        border: 1px solid #333; 
+    }
+
+    .label-left {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        font-size: 110px;
+        color: #111;
+        line-height: 1;
+    }
+
+    .label-right {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding-left: 10px;
+        border-left: 1px solid #eee;
+    }
+
+    .zone-info {
+        font-size: 18px;
+        text-transform: uppercase;
+        color: #777;
+        letter-spacing: 0.5px;
+        line-height: 1.4;
+        text-align: right;
+    }
+    .zone-info b { color: black; font-weight: bold; }
+
+    .barcode-area {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+    }
+
+    #barcodeCanvas {
+        display: block;
+    }
+
+    .operator-name { 
+        font-size: 13px; 
+        font-style: italic; 
+        color: #555;
+    }
+
+    @media print {
+        body { background: white; padding: 0; margin: 0; }
+        h1, .controls, .preview-title, .preview-container { display: none !important; }
+        
+        #label-preview { 
+            display: flex !important;
+            position: absolute; 
+            left: 0; 
+            top: 0; 
+            border: none; 
+            padding: 1mm;
+            margin: 0;
+            width: 38mm;
+            height: 25mm;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .label-left { font-size: 10mm; }
+        .zone-info { font-size: 1.8mm; line-height: 1.4; }
+        .zone-info b { font-size: 2mm; }
+        .operator-name { font-size: 1.5mm; }
+        .label-right { padding-left: 1mm; }
+    }
+</style>
+```
+
+</head>
+<body>
+
+```
+<h1>Gestionnaire d'Étiquettes d'Emplacement</h1>
+
+<div class="controls">
+    <form onsubmit="return false;">
+        <div class="input-row">
+            <div class="form-group">
+                <label for="zoneNum">Zone</label>
+                <input type="text" id="zoneNum" value="10" maxlength="3">
+            </div>
+            <div class="form-group">
+                <label for="alleeNum">Allée (room)</label>
+                <input type="text" id="alleeNum" value="8" maxlength="3">
+            </div>
+        </div>
+
+        <div class="input-row">
+            <div class="form-group">
+                <label for="etagereChar">Étagère (rack)</label>
+                <input type="text" id="etagereChar" value="J" maxlength="1">
+            </div>
+            <div class="form-group">
+                <label for="etageNum">Niveau (shelf)</label>
+                <input type="text" id="etageNum" value="8" maxlength="2">
+            </div>
+            <div class="form-group">
+                <label for="emplacementChar">Place (bin)</label>
+                <input type="text" id="emplacementChar" value="B" maxlength="1">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="operator">Opérateur</label>
+            <input type="text" id="operator" value="Kevin G.">
+        </div>
+
+        <button class="btn-update" onclick="updateLabel()">Générer / Mettre à jour</button>
+        <button class="btn-print" onclick="window.print()">🖨 Imprimer l'étiquette</button>
+    </form>
+    <div class="encoded-value" id="encodedValue">Code encodé : —</div>
+    <p class="print-info">Prévisualisation ×10. Impression réelle : 38mm × 25mm.</p>
+</div>
+
+<div class="preview-title">Prévisualisation de l'étiquette :</div>
+<div class="preview-container">
+    <div id="label-preview">
+        <div class="label-left" id="displayCode">J8B</div>
+
+        <div class="label-right">
+            <div class="zone-info">
+                Zone <b><span id="displayZone">10</span></b><br>
+                Allée <b><span id="displayAllee">8</span></b>
+            </div>
+            <div class="barcode-area">
+                <canvas id="barcodeCanvas"></canvas>
+            </div>
+            <div class="operator-name" id="displayOp">Kevin G.</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    /**
+     * Calcule le code numérique selon la formule exacte du site officiel :
+     *
+     * code = (area == '0' ? 2030 : 21 + padding(area, 2)) * 100000000
+     *      + room    * 1000000
+     *      + (rack - 'A' + 1) * 10000
+     *      + shelf   * 100
+     *      + (bin - 'A' + 1)
+     *
+     * Exemple : Zone=10, Allée=8, Rack=J(10), Shelf=8, Bin=B(2)
+     *   prefix = 2110
+     *   code = 2110 * 100000000 + 8*1000000 + 10*10000 + 8*100 + 2
+     *        = 211000000000 + 8000000 + 100000 + 800 + 2
+     *        = 211008100802
+     */
+    function computeCode(area, room, rack, shelf, bin) {
+        const areaPadded = ('0' + area).slice(-2); // ex: "10" → "10", "9" → "09"
+        const prefix = parseInt(area == '0' ? '2030' : '21' + areaPadded);
+
+        const code = prefix * 100000000
+            + parseInt(room)  * 1000000
+            + (rack.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0) + 1) * 10000
+            + parseInt(shelf) * 100
+            + (bin.toUpperCase().charCodeAt(0)  - 'A'.charCodeAt(0) + 1);
+
+        return String(code);
+    }
+
+    function updateLabel() {
+        const zone        = document.getElementById('zoneNum').value.trim();
+        const allee       = document.getElementById('alleeNum').value.trim();
+        const etagere     = document.getElementById('etagereChar').value.trim().toUpperCase();
+        const etage       = document.getElementById('etageNum').value.trim();
+        const emplacement = document.getElementById('emplacementChar').value.trim().toUpperCase();
+        const op          = document.getElementById('operator').value.trim();
+
+        if (!zone || !allee || !etagere || !etage || !emplacement) return;
+
+        // Code affiché sur l'étiquette (ex: J8B)
+        const displayCode = etagere + etage + emplacement;
+
+        // ✅ Code numérique calculé selon la formule officielle
+        const numericCode = computeCode(zone, allee, etagere, etage, emplacement);
+
+        // Mise à jour affichage
+        document.getElementById('displayZone').innerText  = zone;
+        document.getElementById('displayAllee').innerText = allee;
+        document.getElementById('displayCode').innerText  = displayCode;
+        document.getElementById('displayOp').innerText    = op;
+        document.getElementById('encodedValue').innerText = 'Code encodé : ' + numericCode;
+
+        // ✅ Génération Data Matrix avec le code numérique officiel
+        try {
+            bwipjs.toCanvas('barcodeCanvas', {
+                bcid:        'datamatrix',
+                text:        numericCode,
+                scale:       3,
+                padding:     3,
+                includetext: false,
+            });
+        } catch (e) {
+            console.error(e);
+            alert('Erreur lors de la génération : ' + e.message);
+        }
+    }
+
+    // Mise à jour automatique à chaque frappe
+    document.querySelectorAll('.controls input').forEach(function(input) {
+        input.addEventListener('input', updateLabel);
+    });
+
+    window.onload = updateLabel;
+</script>
+```
+
+</body>
+</html>
