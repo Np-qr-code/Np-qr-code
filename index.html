@@ -3,47 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PharmaLogix Pro - Officiel</title>
+    <title>PharmaLogix Pro - Mass Generator</title>
     <script src="https://cdn.jsdelivr.net/npm/bwip-js@3.0.4/dist/bwip-js-min.js"></script>
     <style>
         :root { --primary: #000; --accent: #2563eb; --bg: #f2f2f7; --card: #fff; --sub: #8e8e93; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; align-items: center; padding-bottom: 50px; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; display: flex; flex-direction: column; align-items: center; }
         
-        /* Navigation Style App */
         nav { width: 100%; background: var(--card); padding: 15px 0; display: flex; justify-content: center; border-bottom: 0.5px solid #d1d1d6; position: sticky; top: 0; z-index: 100; }
-        .nav-container { width: 90%; max-width: 400px; display: flex; background: #e3e3e6; padding: 4px; border-radius: 10px; }
-        .nav-item { flex: 1; text-align: center; cursor: pointer; font-weight: 600; font-size: 13px; padding: 8px 0; border-radius: 8px; }
+        .nav-container { width: 95%; max-width: 600px; display: flex; background: #e3e3e6; padding: 4px; border-radius: 10px; gap: 2px; }
+        .nav-item { flex: 1; text-align: center; cursor: pointer; font-weight: 600; font-size: 10px; padding: 8px 0; border-radius: 8px; text-transform: uppercase; }
         .nav-item.active { background: var(--card); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         
-        /* Conteneur principal */
-        .container { width: 90%; max-width: 400px; margin-top: 20px; z-index: 10; position: relative; }
-        .card { background: var(--card); border-radius: 20px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .container { width: 90%; max-width: 450px; margin-top: 20px; }
+        .card { background: var(--card); border-radius: 20px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 20px; }
         
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .field { display: flex; flex-direction: column; gap: 5px; }
-        label { font-size: 11px; font-weight: 700; color: var(--sub); text-transform: uppercase; }
-        input { padding: 14px; border: 1px solid #d1d1d6; border-radius: 12px; font-size: 16px; outline: none; background: #f9f9fb; }
-        
-        .btn-stack { display: flex; flex-direction: column; gap: 10px; }
-        button { padding: 16px; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; font-size: 16px; width: 100%; }
-        .btn-main { background: var(--primary); color: #fff; }
-        .btn-print { background: #34c759; color: #fff; display: none; margin-top: 15px; }
-        
-        /* --- ZONE D'APERÇU (STYLE VERTICAL CENTRÉ) --- */
-        #print-zone { display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 40px; }
-        
-        .label-style { 
-            display: none; 
-            width: 1.5in; height: 1in; background: #fff; border: 1px solid #ccc; 
-            flex-direction: column; justify-content: center; align-items: center; 
-            margin-bottom: 15px; page-break-after: always; overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 0.05in; box-sizing: border-box;
-        }
+        .mode-selector { display: flex; background: #f2f2f7; padding: 3px; border-radius: 8px; margin-bottom: 15px; }
+        .mode-btn { flex: 1; border: none; padding: 6px; font-size: 11px; font-weight: bold; border-radius: 6px; cursor: pointer; background: none; color: var(--sub); }
+        .mode-btn.active { background: white; color: black; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
-        .bc-container { width: 100%; height: 0.7in; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .txt-container { width: 100%; height: 0.3in; display: flex; align-items: center; justify-content: center; font-size: 18pt; font-weight: 800; color: #000; letter-spacing: -0.5px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .field { display: flex; flex-direction: column; gap: 4px; }
+        label { font-size: 10px; font-weight: 700; color: var(--sub); text-transform: uppercase; }
+        input { padding: 12px; border: 1px solid #d1d1d6; border-radius: 10px; font-size: 14px; outline: none; background: #f9f9fb; }
         
-        canvas { max-height: 100%; max-width: 100%; image-rendering: pixelated; }
+        .btn-main { background: var(--primary); color: #fff; padding: 16px; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 10px; }
+        .btn-print { background: #34c759; color: #fff; display: none; margin-top: 15px; width: 100%; padding: 16px; border-radius: 14px; border: none; font-weight: 700; }
+        
+        #print-zone { display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 30px; }
+        .label-style { display: flex; width: 1.5in; height: 1in; background: #fff; border: 1px solid #ccc; flex-direction: column; justify-content: center; align-items: center; margin-bottom: 15px; page-break-after: always; padding: 0.05in; box-sizing: border-box; }
+        
+        .bc-box { width: 100%; height: 0.7in; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .txt-box { width: 100%; height: 0.3in; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18pt; color: #000; }
+        canvas { max-height: 100%; max-width: 95%; image-rendering: pixelated; }
 
         @media print {
             .no-print, nav, .container { display: none !important; }
@@ -59,111 +50,150 @@
             <div class="nav-item active" onclick="switchTab('emplacement', this)">Emplacement</div>
             <div class="nav-item" onclick="switchTab('allee', this)">Allée</div>
             <div class="nav-item" onclick="switchTab('badge', this)">Badge</div>
+            <div class="nav-item" onclick="switchTab('etoile', this)">Emplacement étoile</div>
         </div>
     </nav>
 
     <div class="container no-print">
         <div class="card">
-            <h2 id="tab-title" style="text-align:center; font-size: 1.1rem; margin-top:0;">Nouvel Emplacement</h2>
+            <h2 id="tab-title" style="text-align:center; font-size: 1.1rem; margin:0 0 15px 0;">Emplacement</h2>
             
-            <div id="form-emp">
-                <div class="grid"><div class="field"><label>Zone</label><input type="number" id="e-z" placeholder="10"></div><div class="field"><label>Allée</label><input type="number" id="e-a" placeholder="8"></div></div>
-                <div class="grid"><div class="field"><label>Étagère</label><input type="text" id="e-etg" maxlength="1" placeholder="J"></div><div class="field"><label>Étage</label><input type="number" id="e-niv" placeholder="8"></div></div>
-                <div class="field" style="margin-top:10px;"><label>Place</label><input type="text" id="e-pl" maxlength="1" placeholder="B"></div>
+            <div class="mode-selector" id="mode-ui">
+                <button class="mode-btn active" id="mode-single" onclick="setSubMode('single')">Unique</button>
+                <button class="mode-btn" id="mode-mass" onclick="setSubMode('mass')"> Masse</button>
             </div>
 
-            <div id="form-allee" style="display:none;">
-                <div class="grid"><div class="field"><label>Zone</label><input type="number" id="a-z" placeholder="5"></div><div class="field"><label>Allée</label><input type="number" id="a-a" placeholder="1"></div></div>
-            </div>
+            <div id="form-container"></div>
 
-            <div id="form-badge" style="display:none;">
-                <div class="grid"><div class="field"><label>Nom de l'opérateur</label><input type="text" id="b-name" placeholder="KEVIN G."></div><div class="field"><label>N° Badge (4 chiffres)</label><input type="number" id="b-id" placeholder="2462"></div></div>
-            </div>
-
-            <div class="btn-stack">
-                <button class="btn-main" onclick="generate()">GÉNÉRER L'APERÇU</button>
-                <button id="btnPrint" class="btn-print" onclick="window.print()">IMPRIMER L'ÉTQUETTE</button>
-                <button onclick="location.reload()" style="background:#eee; color:#333; margin-top:10px;">RESET</button>
-            </div>
+            <button class="btn-main" onclick="generate()">GÉNÉRER </button>
+            <button id="btnPrint" class="btn-print" onclick="window.print()">IMPRIMER </button>
+            <button onclick="location.reload()" style="background:none; color:var(--sub); border:none; width:100%; margin-top:10px; font-size:12px; cursor:pointer;">Réinitialiser</button>
         </div>
     </div>
 
-    <div id="print-zone">
-        <div id="label-emp" class="label-style">
-            <div class="bc-container">
-                <canvas id="c-emp"></canvas>
-            </div>
-            <div class="txt-container" id="t-emp"></div>
-        </div>
-    </div>
+    <div id="print-zone"></div>
 
     <script>
         let currentTab = 'emplacement';
+        let subMode = 'single';
 
-        function getCheckDigit(number) {
-            let sum = 0, str = number.toString();
-            for (let i = 0; i < str.length; i++) {
-                let digit = parseInt(str.charAt(str.length - 1 - i));
-                sum += (i % 2 === 0) ? digit * 3 : digit;
-            }
-            return (10 - (sum % 10)) % 10;
-        }
+        const forms = {
+            emplacement: {
+                single: `<div class="grid"><div class="field"><label>Zone</label><input type="number" id="z" placeholder="10"></div><div class="field"><label>Allée</label><input type="number" id="a" placeholder="8"></div></div>
+                         <div class="grid"><div class="field"><label>Étagère</label><input type="text" id="etg" maxlength="1" placeholder="J"></div><div class="field"><label>Étage</label><input type="number" id="niv" placeholder="1"></div><div class="field"><label>Place</label><input type="text" id="pl" maxlength="1" placeholder="A"></div></div>`,
+                mass: `<div class="grid"><div class="field"><label>Zone</label><input type="number" id="z" placeholder="10"></div><div class="field"><label>Allée</label><input type="number" id="a" placeholder="8"></div></div>
+                       <div class="grid"><div class="field"><label>Étagère de</label><input type="text" id="etg_start" placeholder="A" maxlength="1"></div><div class="field"><label>à</label><input type="text" id="etg_end" placeholder="C" maxlength="1"></div></div>
+                       <div class="grid"><div class="field"><label>Nb Étages</label><input type="number" id="niv_max" placeholder="5"></div><div class="field"><label>Place de A à...</label><input type="text" id="pl_end" placeholder="B" maxlength="1"></div></div>`
+            },
+            allee: {
+                single: `<div class="grid"><div class="field"><label>Zone</label><input type="number" id="z" placeholder="5"></div><div class="field"><label>Allée</label><input type="number" id="a" placeholder="1"></div></div>`,
+                mass: `<div class="grid"><div class="field"><label>Zone</label><input type="number" id="z" placeholder="5"></div><div class="field"><label>Allées de</label><input type="number" id="a_start" placeholder="1"></div><div class="field"><label>à</label><input type="number" id="a_end" placeholder="12"></div></div>`
+            },
+            badge: `<div class="field" style="margin-bottom:10px;"><label>Nom Opérateur</label><input type="text" id="b_name" placeholder="KEVIN G."></div><div class="field"><label>N° Badge</label><input type="number" id="b_id" placeholder="2462"></div>`,
+            etoile: `<div class="field"><label>Code à encoder</label><input type="text" id="star_code" placeholder="TEXTE LIBRE"></div>`
+        };
 
         function switchTab(tab, el) {
             currentTab = tab;
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
-            document.getElementById('tab-title').innerText = "Nouveau/Nouvelle " + el.innerText;
-            document.getElementById('form-emp').style.display = (tab === 'emplacement' ? 'block' : 'none');
-            document.getElementById('form-allee').style.display = (tab === 'allee' ? 'block' : 'none');
-            document.getElementById('form-badge').style.display = (tab === 'badge' ? 'block' : 'none');
+            document.getElementById('mode-ui').style.display = (tab==='emplacement' || tab==='allee') ? 'flex' : 'none';
+            setSubMode('single');
+        }
+
+        function setSubMode(mode) {
+            subMode = mode;
+            document.getElementById('mode-single').className = mode === 'single' ? 'mode-btn active' : 'mode-btn';
+            document.getElementById('mode-mass').className = mode === 'mass' ? 'mode-btn active' : 'mode-btn';
+            document.getElementById('form-container').innerHTML = (currentTab === 'emplacement' || currentTab === 'allee') ? forms[currentTab][mode] : forms[currentTab];
+            document.getElementById('print-zone').innerHTML = '';
             document.getElementById('btnPrint').style.display = 'none';
         }
 
-        function generate() {
-            const pz = document.getElementById('print-zone');
-            
-            if(currentTab === 'emplacement') {
-                const z = document.getElementById('e-z').value, a = document.getElementById('e-a').value, et = document.getElementById('e-etg').value.toUpperCase(), ni = document.getElementById('e-niv').value, pl = document.getElementById('e-pl').value.toUpperCase();
-                if(!z || !a || !et || !ni || !pl) return alert("Champs vides !");
-                
-                let codeBase = parseInt((z == '0' ? '2030' : '21' + ('0' + z).slice(-2)) + '00000000') + (parseInt(a) * 1000000) + (et.charCodeAt(0)-64)*10000 + (parseInt(ni)*100) + (pl.charCodeAt(0)-64);
-                let finalCode = codeBase.toString() + getCheckDigit(codeBase);
-                
-                // Texte formaté : Zone-AlléeÉtagèreÉtagePlace
-                document.getElementById('t-emp').innerText = z + "-" + a + et + ni + pl;
-                document.getElementById('label-emp').style.display = 'flex';
-                
-                bwipjs.toCanvas('c-emp', { bcid:'datamatrix', text:finalCode, scale:10, padding:2 });
-
-            } else if(currentTab === 'allee') {
-                const z = document.getElementById('a-z').value, a = document.getElementById('a-a').value;
-                if(!z || !a) return alert("Zone et Allée requises !");
-                pz.innerHTML = ''; 
-                const zFix = ("0" + z).slice(-2), aFix = ("0" + a).slice(-2);
-                const configs = [ {id:"AZ", p:"20330000", t:`Area ${z} Room ${a} (A à Z)`}, {id:"ZA", p:"20330100", t:`Area ${z} Room ${a} (Z à A)`} ];
-                configs.forEach(c => {
-                    let base = c.p + zFix + aFix, full = base + getCheckDigit(base);
-                    let div = document.createElement('div'); div.className = 'label-style'; div.style.display = 'flex';
-                    div.innerHTML = `<div style="height:0.35in; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:10pt;">${c.t}</div><div style="height:0.65in; display:flex; align-items:center; justify-content:center;"><canvas id="ca-${c.id}"></canvas></div>`;
-                    pz.appendChild(div);
-                    bwipjs.toCanvas(`ca-${c.id}`, { bcid: 'code128', text: full, scale: 2.5, height: 10, includetext: true, textsize: 8, textxalign: 'center' });
-                });
-
-            } else if(currentTab === 'badge') {
-                const name = document.getElementById('b-name').value, id = document.getElementById('b-id').value;
-                if(!name || !id) return alert("Nom et N° de badge requis !");
-                pz.innerHTML = '';
-                const idFix = ("000" + id).slice(-4); 
-                const baseBadge = "20320000" + idFix, fullBadge = baseBadge + getCheckDigit(baseBadge);
-                let div = document.createElement('div'); div.className = 'label-style'; div.style.display = 'flex';
-                div.innerHTML = `<div style="font-size:12pt; text-transform:uppercase; border-bottom:1px solid #000; width:95%; height:0.4in; display:flex; align-items:center; justify-content:center; font-weight:bold;">${name}</div><div style="height:0.55in; display:flex; align-items:center; justify-content:center;"><canvas id="c-badge"></canvas></div>`;
-                pz.appendChild(div);
-                bwipjs.toCanvas('c-badge', { bcid:'code128', text:fullBadge, scale:2.2, height:12, includetext:true, textsize:9, textxalign: 'center' });
+        function getCheckDigit(n) {
+            let sum = 0, str = n.toString();
+            for (let i = 0; i < str.length; i++) {
+                let d = parseInt(str.charAt(str.length - 1 - i));
+                sum += (i % 2 === 0) ? d * 3 : d;
             }
+            return (10 - (sum % 10)) % 10;
+        }
+
+        async function generate() {
+            const pz = document.getElementById('print-zone');
+            pz.innerHTML = '';
+            let tasks = [];
+
+            if (currentTab === 'emplacement') {
+                if (subMode === 'single') {
+                    tasks.push({ z: document.getElementById('z').value, a: document.getElementById('a').value, etg: document.getElementById('etg').value.toUpperCase(), niv: document.getElementById('niv').value, pl: document.getElementById('pl').value.toUpperCase() });
+                } else {
+                    const z = document.getElementById('z').value, a = document.getElementById('a').value;
+                    const s = document.getElementById('etg_start').value.toUpperCase().charCodeAt(0);
+                    const e = document.getElementById('etg_end').value.toUpperCase().charCodeAt(0);
+                    const nMax = parseInt(document.getElementById('niv_max').value);
+                    const pMax = document.getElementById('pl_end').value.toUpperCase().charCodeAt(0);
+                    for (let ie = s; ie <= e; ie++) {
+                        for (let iniv = 1; iniv <= nMax; iniv++) {
+                            for (let ip = 65; ip <= pMax; ip++) {
+                                tasks.push({ z, a, etg: String.fromCharCode(ie), niv: iniv, pl: String.fromCharCode(ip) });
+                            }
+                        }
+                    }
+                }
+                for (let i=0; i < tasks.length; i++) {
+                    let t = tasks[i];
+                    let base = parseInt((t.z == '0' ? '2030' : '21' + ('0' + t.z).slice(-2)) + '00000000') + (parseInt(t.a) * 1000000) + (t.etg.charCodeAt(0)-64)*10000 + (parseInt(t.niv)*100) + (t.pl.charCodeAt(0)-64);
+                    let fullCode = base.toString() + getCheckDigit(base);
+                    let label = document.createElement('div');
+                    label.className = 'label-style';
+                    label.innerHTML = `<div class="bc-box"><canvas id="c-emp-${i}"></canvas></div><div class="txt-box">${t.z}-${t.a}${t.etg}${t.niv}${t.pl}</div>`;
+                    pz.appendChild(label);
+                    bwipjs.toCanvas(`c-emp-${i}`, { bcid:'datamatrix', text:fullCode, scale:10, padding:2 });
+                }
+            } 
+            else if (currentTab === 'allee') {
+                let list = [];
+                if (subMode === 'single') list.push({z: document.getElementById('z').value, a: document.getElementById('a').value});
+                else {
+                    const z = document.getElementById('z').value, start = parseInt(document.getElementById('a_start').value), end = parseInt(document.getElementById('a_end').value);
+                    for(let i=start; i<=end; i++) list.push({z, a: i});
+                }
+                for (let i=0; i < list.length; i++) {
+                    let t = list[i];
+                    const zF = ("0"+t.z).slice(-2), aF = ("0"+t.a).slice(-2);
+                    const configs = [{id:`${i}AZ`, c:`20330000${zF}${aF}`, t:`Area ${t.z} Room ${t.a} (A-Z)`}, {id:`${i}ZA`, c:`20330100${zF}${aF}`, t:`Area ${t.z} Room ${aF} (Z-A)`}];
+                    for (let conf of configs) {
+                        let full = conf.c + getCheckDigit(conf.c);
+                        let div = document.createElement('div'); div.className = 'label-style';
+                        div.innerHTML = `<div style="height:0.3in; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:10pt; text-align:center;">${conf.t}</div><div class="bc-box" style="height:0.7in;"><canvas id="ca-${conf.id}"></canvas></div>`;
+                        pz.appendChild(div);
+                        bwipjs.toCanvas(`ca-${conf.id}`, { bcid:'code128', text:full, scale:2.5, height:12, includetext:true, textsize:8, textxalign:'center'});
+                    }
+                }
+            }
+            else if (currentTab === 'badge') {
+                const n = document.getElementById('b_name').value, id = document.getElementById('b_id').value;
+                const full = "20320000" + ("000"+id).slice(-4);
+                const code = full + getCheckDigit(full);
+                let div = document.createElement('div'); div.className = 'label-style';
+                div.innerHTML = `<div style="font-size:14pt; border-bottom:1px solid #000; width:95%; height:0.4in; display:flex; align-items:center; justify-content:center; font-weight:bold; text-transform:uppercase;">${n}</div><div class="bc-box" style="height:0.6in;"><canvas id="c-badge"></canvas></div>`;
+                pz.appendChild(div);
+                bwipjs.toCanvas('c-badge', { bcid:'code128', text:code, scale:2.2, height:12, includetext:true, textsize:9, textxalign:'center'});
+            }
+            else if (currentTab === 'etoile') {
+                const sc = document.getElementById('star_code').value;
+                let div = document.createElement('div'); div.className = 'label-style';
+                div.innerHTML = `<div class="bc-box" style="height:1in;"><canvas id="c-star"></canvas></div>`;
+                pz.appendChild(div);
+                bwipjs.toCanvas('c-star', { bcid:'code128', text:sc, scale:3, height:20, includetext:true, textsize:10 });
+            }
+
             document.getElementById('btnPrint').style.display = 'block';
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
+
+        window.onload = () => setSubMode('single');
     </script>
 </body>
 </html>
