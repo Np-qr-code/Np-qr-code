@@ -3,38 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PharmaLogix Pro - Mass Generator</title>
+    <title>PharmaLogix Pro - Système Intégral</title>
     <script src="https://cdn.jsdelivr.net/npm/bwip-js@3.0.4/dist/bwip-js-min.js"></script>
     <style>
         :root { 
-            --primary: #000; --accent: #2563eb; --bg: #f2f2f7; --card: #fff; --sub: #8e8e93; --text: #000;
+            --primary: #000; --accent: #2563eb; --bg: #f2f2f7; --card: #fff; --sub: #8e8e93; --text: #000; --nav-bg: #e3e3e6;
         }
 
         body.dark-mode { 
-            --bg: #1c1c1e; --card: #2c2c2e; --sub: #aeaeb2; --text: #ffffff; --primary: #ffffff;
+            --bg: #1c1c1e; --card: #2c2c2e; --sub: #aeaeb2; --text: #ffffff; --nav-bg: #3a3a3c; --primary: #ffffff;
         }
 
         body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 90px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; position: relative; transition: background 0.3s, color 0.3s; }
         
-        nav { width: 100%; background: var(--card); padding: 15px 0; display: flex; align-items: center; border-bottom: 0.5px solid #d1d1d6; position: sticky; top: 0; z-index: 100; }
-        .nav-wrapper { width: 95%; max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: flex-start; }
-        .logo-img { height: 50px; width: auto; border-radius: 8px; } 
+        /* HEADER AVEC LOGO XXL À GAUCHE */
+        nav { width: 100%; background: var(--card); padding: 15px 0; display: flex; align-items: center; justify-content: center; border-bottom: 0.5px solid #d1d1d6; position: sticky; top: 0; z-index: 100; }
+        .nav-wrapper { width: 95%; max-width: 1200px; display: flex; align-items: center; justify-content: center; position: relative; }
         
-        .container { width: 90%; max-width: 550px; margin-top: 40px; }
-        .card { background: var(--card); border-radius: 25px; padding: 30px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); margin-bottom: 30px; }
-        h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 25px; text-transform: uppercase; text-align: center; }
+        .logo-container { position: absolute; left: 0; top: 50%; transform: translateY(-50%); display: flex; align-items: center; }
+        .logo-img { height: 50px; width: auto; border-radius: 8px; } 
 
-        /* GRILLE DE SÉLECTION AREA */
-        .zone-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 25px; }
-        .zone-btn { background: var(--bg); border: 1.5px solid var(--sub); color: var(--text); padding: 15px; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.2s; text-align: center; }
-        .zone-btn:hover { border-color: var(--accent); color: var(--accent); }
-        .zone-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3); }
+        .nav-container { display: flex; background: var(--nav-bg); padding: 5px; border-radius: 12px; gap: 4px; min-width: 500px; }
+        .nav-item { flex: 1; text-align: center; cursor: pointer; font-weight: 700; font-size: 11px; padding: 10px 0; border-radius: 8px; text-transform: uppercase; color: var(--sub); white-space: nowrap; transition: 0.2s; }
+        .nav-item.active { background: var(--card); box-shadow: 0 4px 10px rgba(0,0,0,0.1); color: var(--text); }
+        
+        .container { width: 90%; max-width: 580px; margin-top: 40px; }
+        .card { background: var(--card); border-radius: 25px; padding: 30px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        #tab-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; text-transform: uppercase; text-align: center; }
+
+        .mode-selector { display: flex; background: var(--bg); padding: 4px; border-radius: 10px; margin-bottom: 25px; gap: 4px; }
+        .mode-btn { flex: 1; border: none; padding: 10px; font-size: 13px; font-weight: 800; border-radius: 8px; cursor: pointer; background: none; color: var(--sub); text-transform: uppercase; }
+        .mode-btn.active { background: var(--card); color: var(--text); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+
+        /* GRILLE DE BOUTONS AREA */
+        .area-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; margin-bottom: 20px; }
+        .area-btn { background: var(--bg); border: 1.5px solid var(--sub); color: var(--text); padding: 12px; border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer; transition: 0.2s; text-align: center; }
+        .area-btn:hover { border-color: var(--accent); }
+        .area-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
         .grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         .field { display: flex; flex-direction: column; gap: 8px; }
         label { font-size: 11px; font-weight: 800; color: var(--sub); text-transform: uppercase; letter-spacing: 0.8px; }
-        input { padding: 16px; border: 1.5px solid var(--sub); border-radius: 12px; font-size: 16px; outline: none; background: var(--bg); color: var(--text); transition: 0.3s; width: 100%; box-sizing: border-box; }
-        input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        input { padding: 16px; border: 1.5px solid var(--sub); border-radius: 12px; font-size: 16px; outline: none; background: var(--bg); color: var(--text); width: 100%; box-sizing: border-box; }
+        input:focus { border-color: var(--accent); }
         
         .btn-main { background: var(--primary); color: var(--bg); padding: 20px; border: none; border-radius: 18px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 15px; font-size: 16px; text-transform: uppercase; }
         .btn-print { background: #34c759; color: #fff; display: none; margin-top: 25px; width: 100%; padding: 20px; border-radius: 18px; border: none; font-weight: 800; font-size: 16px; text-transform: uppercase; }
@@ -42,7 +53,10 @@
         #print-zone { display: grid; gap: 20px; justify-content: center; width: fit-content; margin: 40px auto; }
         .label-style { display: flex; width: 1.5in; height: 1in; background: #fff !important; border: 1px solid #ccc; flex-direction: column; justify-content: center; align-items: center; padding: 0.05in; box-sizing: border-box; position: relative; color: #000 !important; }
         .label-signature { position: absolute; bottom: 2px; right: 5px; font-size: 5pt; color: #bbb; font-style: italic; }
-        .txt-box-emp { width: 100%; height: 0.35in; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18pt; color: #000; }
+        
+        .txt-box-emp { width: 100%; height: 0.35in; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18pt; }
+        .txt-row1 { font-size: 10pt; font-weight: bold; }
+        .txt-row2 { font-size: 14pt; font-weight: bold; margin: 2px 0; }
         canvas { max-height: 100%; max-width: 95%; image-rendering: pixelated; }
 
         .theme-toggle { position: fixed; bottom: 30px; left: 30px; width: 55px; height: 55px; background: var(--card); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 8px 20px rgba(0,0,0,0.2); z-index: 1000; border: 1px solid var(--sub); font-size: 26px; }
@@ -63,35 +77,34 @@
 
     <nav class="no-print">
         <div class="nav-wrapper">
-            <img src="logo.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
+            <div class="logo-container">
+                <img src="logo.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
+            </div>
+            <div class="nav-container">
+                <div class="nav-item" id="btn-emp" onclick="switchTab('emplacement', this)">Emplacement</div>
+                <div class="nav-item" onclick="switchTab('allee', this)">Allée</div>
+                <div class="nav-item" onclick="switchTab('badge', this)">Badge</div>
+                <div class="nav-item" onclick="switchTab('etoile', this)">Emplacement étoile</div>
+            </div>
         </div>
     </nav>
 
     <div class="container no-print">
         <div class="card">
-            <h2>Choisir une Zone</h2>
+            <h2 id="tab-title">Emplacement</h2>
             
-            <div class="zone-grid">
-                <button class="zone-btn" onclick="selectZone(1, this)">Area 1</button>
-                <button class="zone-btn" onclick="selectZone(2, this)">Area 2</button>
-                <button class="zone-btn" onclick="selectZone(3, this)">Area 3</button>
-                <button class="zone-btn" onclick="selectZone(4, this)">Area 4</button>
-                <button class="zone-btn" onclick="selectZone(5, this)">Area 5</button>
-                <button class="zone-btn" onclick="selectZone(10, this)">Area 10</button>
-                <button class="zone-btn" onclick="selectZone(11, this)">Area 11</button>
-                <button class="zone-btn" onclick="selectZone(12, this)">Area 12</button>
-                <button class="zone-btn" onclick="selectZone(13, this)">Area 13</button>
-                <button class="zone-btn" onclick="selectZone(21, this)">Area 21</button>
-                <button class="zone-btn" onclick="selectZone(22, this)">Area 22</button>
-                <button class="zone-btn" onclick="selectZone(23, this)">Area 23</button>
+            <div class="mode-selector" id="mode-ui">
+                <button class="mode-btn active" id="mode-single" onclick="setSubMode('single')">Unique</button>
+                <button class="mode-btn" id="mode-mass" onclick="setSubMode('mass')"> Masse</button>
             </div>
 
-            <div class="grid-inputs">
-                <div class="field"><label>Allée</label><input type="number" id="a"></div>
-                <div class="field"><label>Étagère</label><input type="text" id="etg" maxlength="1"></div>
-                <div class="field"><label>Étage</label><input type="number" id="niv"></div>
-                <div class="field"><label>Place</label><input type="text" id="pl" maxlength="1"></div>
+            <div id="area-selection-zone" style="display:none;">
+                <label style="display:block; margin-bottom:10px;">Choisir l'Area</label>
+                <div class="area-grid" id="area-grid-btns">
+                    </div>
             </div>
+
+            <div id="form-container"></div>
 
             <button class="btn-main" onclick="generate()">GÉNÉRER </button>
             <button id="btnPrint" class="btn-print" onclick="window.print()">IMPRIMER </button>
@@ -102,15 +115,67 @@
     <div id="print-zone"></div>
 
     <script>
-        let selectedZone = null;
+        let currentTab = '';
+        let subMode = 'single';
+        let selectedArea = null;
+        const PIN_CODE = "2462";
         const SIGNATURE = "Najmkh";
+
+        const areaList = [1, 2, 3, 4, 5, 10, 11, 12, 13, 21, 22, 23, 0];
+
+        const forms = {
+            emplacement: {
+                single: `<div class="grid-inputs"><div class="field"><label>Allée</label><input type="number" id="a"></div><div class="field"><label>Étagère</label><input type="text" id="etg" maxlength="1"></div><div class="field"><label>Étage</label><input type="number" id="niv"></div><div class="field"><label>Place</label><input type="text" id="pl" maxlength="1"></div></div>`,
+                mass: `<div class="grid-inputs"><div class="field" style="grid-column: span 2;"><label>Allée</label><input type="number" id="a"></div><div class="field"><label>Étagère de</label><input type="text" id="etg_start" maxlength="1"></div><div class="field"><label>à</label><input type="text" id="etg_end" maxlength="1"></div><div class="field"><label>Nb Étages</label><input type="number" id="niv_max"></div><div class="field"><label>Place de A à...</label><input type="text" id="pl_end" maxlength="1"></div></div>`
+            },
+            allee: {
+                single: `<div class="field"><label>Numéro d'allée</label><input type="number" id="a"></div>`,
+                mass: `<div class="grid-inputs"><div class="field"><label>Allées de</label><input type="number" id="a_start"></div><div class="field"><label>à</label><input type="number" id="a_end"></div></div>`
+            },
+            badge: `<div class="field" style="margin-bottom:20px;"><label>Nom Opérateur</label><input type="text" id="b_name"></div><div class="field"><label>N° Badge (Matricule)</label><input type="number" id="b_id"></div>`,
+            etoile: `<div class="field"><label>Code à encoder (Code 128)</label><input type="text" id="star_code"></div>`
+        };
 
         function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
 
-        function selectZone(zoneCode, element) {
-            selectedZone = zoneCode;
-            document.querySelectorAll('.zone-btn').forEach(btn => btn.classList.remove('active'));
-            element.classList.add('active');
+        function setupAreaGrid() {
+            const container = document.getElementById('area-grid-btns');
+            container.innerHTML = '';
+            areaList.forEach(num => {
+                const btn = document.createElement('button');
+                btn.className = 'area-btn';
+                btn.innerText = 'Area ' + num;
+                btn.onclick = () => {
+                    selectedArea = num;
+                    document.querySelectorAll('.area-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function switchTab(tab, el) {
+            if (tab === 'etoile') {
+                if (prompt("Veuillez saisir le code PIN :") !== PIN_CODE) return alert("Accès refusé.");
+            }
+            currentTab = tab;
+            selectedArea = null;
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('tab-title').innerText = el.innerText;
+            
+            document.getElementById('mode-ui').style.display = (tab==='emplacement' || tab==='allee') ? 'flex' : 'none';
+            document.getElementById('area-selection-zone').style.display = (tab==='emplacement' || tab==='allee') ? 'block' : 'none';
+            
+            if (tab === 'emplacement' || tab === 'allee') setupAreaGrid();
+            setSubMode('single');
+        }
+
+        function setSubMode(mode) {
+            subMode = mode;
+            document.getElementById('mode-single').className = mode === 'single' ? 'mode-btn active' : 'mode-btn';
+            document.getElementById('mode-mass').className = mode === 'mass' ? 'mode-btn active' : 'mode-btn';
+            document.getElementById('form-container').innerHTML = (currentTab === 'emplacement' || currentTab === 'allee') ? forms[currentTab][mode] : forms[currentTab];
             document.getElementById('print-zone').innerHTML = '';
             document.getElementById('btnPrint').style.display = 'none';
         }
@@ -125,29 +190,97 @@
         }
 
         async function generate() {
-            if (selectedZone === null) return alert("Sélectionnez une Area !");
-            
             const pz = document.getElementById('print-zone');
             pz.innerHTML = '';
-            
-            const a = document.getElementById('a').value;
-            const etg = document.getElementById('etg').value.toUpperCase();
-            const niv = document.getElementById('niv').value;
-            const pl = document.getElementById('pl').value.toUpperCase();
+            pz.style.gridTemplateColumns = "";
+            let tasks = [];
 
-            if(!a || !etg || !niv || !pl) return alert("Complétez tous les champs !");
+            if (currentTab === 'emplacement' || currentTab === 'allee') {
+                if (selectedArea === null) return alert("Veuillez sélectionner une Area.");
+            }
 
-            let base = parseInt((selectedZone == '0' ? '2030' : '21' + ('0' + selectedZone).slice(-2)) + '00000000') + (parseInt(a) * 1000000) + (etg.charCodeAt(0)-64)*10000 + (parseInt(niv)*100) + (pl.charCodeAt(0)-64);
-            let fullCode = base.toString() + getCheckDigit(base);
-            
-            let label = document.createElement('div'); label.className = 'label-style';
-            label.innerHTML = `<div class="bc-box" style="height:0.7in;"><canvas id="c-0"></canvas></div><div class="txt-box-emp">${selectedZone}-${a}${etg}${niv}${pl}</div><div class="label-signature">${SIGNATURE}</div>`;
-            pz.appendChild(label);
-            
-            bwipjs.toCanvas(`c-0`, { bcid:'datamatrix', text:fullCode, scale:10, padding:2 });
+            if (currentTab === 'emplacement') {
+                if (subMode === 'single') {
+                    const a = document.getElementById('a').value, etg = document.getElementById('etg').value.toUpperCase(), niv = document.getElementById('niv').value, pl = document.getElementById('pl').value.toUpperCase();
+                    if(!a || !etg || !niv || !pl) return alert("Champs vides !");
+                    tasks.push({ z: selectedArea, a, etg, niv, pl });
+                    pz.style.gridTemplateColumns = "1.6in";
+                } else {
+                    const a = document.getElementById('a').value, es = document.getElementById('etg_start').value, ee = document.getElementById('etg_end').value, nMax = parseInt(document.getElementById('niv_max').value), pe = document.getElementById('pl_end').value;
+                    if(!a || !es || !ee || isNaN(nMax) || !pe) return alert("Champs vides !");
+                    const s = es.toUpperCase().charCodeAt(0), e = ee.toUpperCase().charCodeAt(0), pMax = pe.toUpperCase().charCodeAt(0);
+                    pz.style.gridTemplateColumns = `repeat(${pMax - 64}, 1.6in)`;
+                    for (let ie = s; ie <= e; ie++) {
+                        for (let iniv = 1; iniv <= nMax; iniv++) {
+                            for (let ip = 65; ip <= pMax; ip++) {
+                                tasks.push({ z: selectedArea, a, etg: String.fromCharCode(ie), niv: iniv, pl: String.fromCharCode(ip) });
+                            }
+                        }
+                    }
+                }
+                for (let i=0; i < tasks.length; i++) {
+                    let t = tasks[i];
+                    let base = parseInt((t.z == '0' ? '2030' : '21' + ('0' + t.z).slice(-2)) + '00000000') + (parseInt(t.a) * 1000000) + (t.etg.charCodeAt(0)-64)*10000 + (parseInt(t.niv)*100) + (t.pl.charCodeAt(0)-64);
+                    let fullCode = base.toString() + getCheckDigit(base);
+                    let div = document.createElement('div'); div.className = 'label-style';
+                    div.innerHTML = `<div style="height:0.65in; display:flex; align-items:center;"><canvas id="c-e-${i}"></canvas></div><div class="txt-box-emp">${t.z}-${t.a}${t.etg}${t.niv}${t.pl}</div><div class="label-signature">${SIGNATURE}</div>`;
+                    pz.appendChild(div);
+                    bwipjs.toCanvas(`c-e-${i}`, { bcid:'datamatrix', text:fullCode, scale:10, padding:2 });
+                }
+            } 
+            else if (currentTab === 'allee') {
+                let list = [];
+                if (subMode === 'single') {
+                    const a = document.getElementById('a').value; if(!a) return alert("Allée vide !");
+                    list.push({z: selectedArea, a});
+                } else {
+                    const start = parseInt(document.getElementById('a_start').value), end = parseInt(document.getElementById('a_end').value);
+                    if(isNaN(start) || isNaN(end)) return alert("Champs vides !");
+                    for(let i=start; i<=end; i++) list.push({z: selectedArea, a: i});
+                }
+                pz.style.gridTemplateColumns = "repeat(2, 1.6in)";
+                for (let i=0; i < list.length; i++) {
+                    let t = list[i];
+                    const zF = ("0"+t.z).slice(-2), aF = ("0"+t.a).slice(-2);
+                    const configs = [
+                        {id:`${i}AZ`, c:`20330000${zF}${aF}`, t:`Area ${t.z} Room ${t.a}`, dir: 'A ➔ Z'},
+                        {id:`${i}ZA`, c:`20330100${zF}${aF}`, t:`Area ${t.z} Room ${t.a}`, dir: 'Z ➔ A'}
+                    ];
+                    configs.forEach(conf => {
+                        let full = conf.c + getCheckDigit(conf.c);
+                        let div = document.createElement('div'); div.className = 'label-style';
+                        div.innerHTML = `<div class="txt-row1">${conf.t}</div><div class="txt-row2">${conf.dir}</div><div style="height:0.55in; display:flex; align-items:center;"><canvas id="ca-${conf.id}"></canvas></div><div class="label-signature">${SIGNATURE}</div>`;
+                        pz.appendChild(div);
+                        bwipjs.toCanvas(`ca-${conf.id}`, { bcid:'code128', text:full, scale:2.5, height:12, includetext:true, textsize:8, textxalign:'center'});
+                    });
+                }
+            }
+            else if (currentTab === 'badge') {
+                const nIn = document.getElementById('b_name').value, idIn = document.getElementById('b_id').value;
+                if(!idIn) return alert("Matricule requis !");
+                const disp = nIn.trim() !== "" ? nIn : idIn;
+                pz.style.gridTemplateColumns = "1.6in";
+                const base = "20320000" + ("000"+idIn).slice(-4);
+                const full = base + getCheckDigit(base);
+                let div = document.createElement('div'); div.className = 'label-style';
+                div.innerHTML = `<div style="font-size:14pt; border-bottom:1px solid #000; width:95%; height:0.4in; display:flex; align-items:center; justify-content:center; font-weight:bold; text-transform:uppercase;">${disp}</div><div style="height:0.55in; display:flex; align-items:center;"><canvas id="c-b"></canvas></div><div class="label-signature">${SIGNATURE}</div>`;
+                pz.appendChild(div);
+                bwipjs.toCanvas('c-b', { bcid:'code128', text:full, scale:2.2, height:12, includetext:true, textsize:9, textxalign:'center'});
+            }
+            else if (currentTab === 'etoile') {
+                const sc = document.getElementById('star_code').value;
+                if(!sc) return alert("Code vide !");
+                pz.style.gridTemplateColumns = "1.6in";
+                let div = document.createElement('div'); div.className = 'label-style';
+                div.innerHTML = `<div style="height:0.9in; display:flex; align-items:center;"><canvas id="c-s"></canvas></div><div class="label-signature">${SIGNATURE}</div>`;
+                pz.appendChild(div);
+                bwipjs.toCanvas('c-s', { bcid:'code128', text:sc, scale:3, height:20, includetext:true, textsize:10 });
+            }
             document.getElementById('btnPrint').style.display = 'block';
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
+
+        window.onload = () => { switchTab('emplacement', document.getElementById('btn-emp')); };
     </script>
 </body>
 </html>
