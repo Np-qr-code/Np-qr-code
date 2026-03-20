@@ -6,71 +6,84 @@
     <title>PharmaLogix Pro - Mass Generator</title>
     <script src="https://cdn.jsdelivr.net/npm/bwip-js@3.0.4/dist/bwip-js-min.js"></script>
     <style>
-        :root { --primary: #000; --accent: #2563eb; --bg: #f2f2f7; --card: #fff; --sub: #8e8e93; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding-bottom: 80px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; position: relative; }
+        :root { 
+            --primary: #000; --accent: #2563eb; --bg: #f2f2f7; --card: #fff; --sub: #8e8e93; --text: #000; --nav-bg: #e3e3e6;
+        }
+
+        /* Variables Mode Sombre */
+        body.dark-mode { 
+            --bg: #1c1c1e; --card: #2c2c2e; --sub: #aeaeb2; --text: #ffffff; --nav-bg: #3a3a3c; --primary: #ffffff;
+        }
+
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 80px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; transition: background 0.3s, color 0.3s; }
         
-        nav { width: 100%; background: var(--card); padding: 15px 0; display: flex; justify-content: center; border-bottom: 0.5px solid #d1d1d6; position: sticky; top: 0; z-index: 100; }
-        .nav-container { width: 95%; max-width: 600px; display: flex; background: #e3e3e6; padding: 4px; border-radius: 10px; gap: 2px; }
-        .nav-item { flex: 1; text-align: center; cursor: pointer; font-weight: 600; font-size: 10px; padding: 8px 0; border-radius: 8px; text-transform: uppercase; }
-        .nav-item.active { background: var(--card); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        nav { width: 100%; background: var(--card); padding: 10px 0; display: flex; align-items: center; justify-content: center; border-bottom: 0.5px solid #d1d1d6; position: sticky; top: 0; z-index: 100; }
+        .nav-wrapper { width: 95%; max-width: 800px; display: flex; align-items: center; justify-content: space-between; }
+        .logo-img { height: 32px; width: auto; border-radius: 6px; }
+        
+        .nav-container { flex: 1; max-width: 550px; display: flex; background: var(--nav-bg); padding: 4px; border-radius: 10px; gap: 2px; margin-left: 15px; }
+        .nav-item { flex: 1; text-align: center; cursor: pointer; font-weight: 600; font-size: 9px; padding: 8px 0; border-radius: 8px; text-transform: uppercase; color: var(--sub); }
+        .nav-item.active { background: var(--card); box-shadow: 0 2px 4px rgba(0,0,0,0.1); color: var(--text); }
         
         .container { width: 90%; max-width: 450px; margin-top: 20px; }
-        .card { background: var(--card); border-radius: 20px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .card { background: var(--card); border-radius: 20px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); margin-bottom: 20px; }
         
-        .mode-selector { display: flex; background: #f2f2f7; padding: 3px; border-radius: 8px; margin-bottom: 15px; }
+        .mode-selector { display: flex; background: var(--bg); padding: 3px; border-radius: 8px; margin-bottom: 15px; }
         .mode-btn { flex: 1; border: none; padding: 6px; font-size: 11px; font-weight: bold; border-radius: 6px; cursor: pointer; background: none; color: var(--sub); }
-        .mode-btn.active { background: white; color: black; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .mode-btn.active { background: var(--card); color: var(--text); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
         .grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .field { display: flex; flex-direction: column; gap: 4px; }
         label { font-size: 10px; font-weight: 700; color: var(--sub); text-transform: uppercase; }
-        input { padding: 12px; border: 1px solid #d1d1d6; border-radius: 10px; font-size: 14px; outline: none; background: #f9f9fb; }
-        input:focus { border-color: var(--accent); background: #fff; }
+        input { padding: 12px; border: 1px solid var(--sub); border-radius: 10px; font-size: 14px; outline: none; background: var(--bg); color: var(--text); }
         
-        .btn-main { background: var(--primary); color: #fff; padding: 16px; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 10px; }
+        .btn-main { background: var(--primary); color: var(--bg); padding: 16px; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 10px; }
         .btn-print { background: #34c759; color: #fff; display: none; margin-top: 15px; width: 100%; padding: 16px; border-radius: 14px; border: none; font-weight: 700; }
         
         #print-zone { display: grid; gap: 15px; justify-content: center; width: fit-content; margin: 30px auto; }
         
-        /* --- ÉTIQUETTE AVEC SIGNATURE --- */
+        /* Les étiquettes restent TOUJOURS blanches pour le scan */
         .label-style { 
-            display: flex; width: 1.5in; height: 1in; background: #fff; border: 1px solid #ccc; 
+            display: flex; width: 1.5in; height: 1in; background: #fff !important; border: 1px solid #ccc; 
             flex-direction: column; justify-content: center; align-items: center; 
-            padding: 0.05in; box-sizing: border-box; position: relative;
+            padding: 0.05in; box-sizing: border-box; position: relative; overflow: hidden; color: #000 !important;
         }
         
-        /* Signature sur l'étiquette */
-        .label-signature { position: absolute; bottom: 2px; right: 5px; font-size: 5pt; color: #bbb; font-style: italic; font-family: serif; }
-
-        .txt-row1 { font-size: 10pt; font-weight: bold; }
-        .txt-row2 { font-size: 14pt; font-weight: bold; margin: 2px 0; }
-        
-        .bc-box { width: 100%; height: 0.6in; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .label-signature { position: absolute; bottom: 2px; right: 5px; font-size: 5pt; color: #bbb; font-style: italic; }
         .txt-box-emp { width: 100%; height: 0.35in; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18pt; color: #000; }
+        .txt-row1 { font-size: 10pt; font-weight: bold; color: #000; }
+        .txt-row2 { font-size: 14pt; font-weight: bold; margin: 2px 0; color: #000; }
         canvas { max-height: 100%; max-width: 95%; image-rendering: pixelated; }
 
-        /* --- SIGNATURE SUR LE SITE --- */
+        /* Bouton Thème Flottant */
+        .theme-toggle { position: fixed; bottom: 15px; left: 15px; width: 45px; height: 45px; background: var(--card); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000; border: 0.5px solid var(--sub); font-size: 20px; }
+
         .site-footer-signature { position: fixed; bottom: 15px; right: 15px; font-size: 14px; color: var(--sub); font-style: italic; opacity: 0.7; z-index: 999; pointer-events: none; }
 
         @media print {
-            .no-print, nav, .container, .site-footer-signature { display: none !important; }
+            .no-print, nav, .container, .site-footer-signature, .theme-toggle { display: none !important; }
             #print-zone { display: block !important; margin-top: 0; width: 100%; }
             .label-style { display: flex !important; border: none !important; width: 1.5in !important; height: 1in !important; margin: 0; page-break-after: always; }
-            /* On garde la signature sur l'étiquette à l'impression si tu veux, ou on l'enlève */
-            .label-signature { color: #000 !important; opacity: 0.3; } 
             @page { size: 1.5in 1in; margin: 0; }
         }
     </style>
 </head>
 <body>
+
+    <div class="theme-toggle no-print" onclick="toggleDarkMode()">🌓</div>
     <div class="site-footer-signature no-print">Najmkh</div>
 
     <nav class="no-print">
-        <div class="nav-container">
-            <div class="nav-item active" onclick="switchTab('emplacement', this)">Emplacement</div>
-            <div class="nav-item" onclick="switchTab('allee', this)">Allée</div>
-            <div class="nav-item" onclick="switchTab('badge', this)">Badge</div>
-            <div class="nav-item" onclick="switchTab('etoile', this)">Emplacement étoile</div>
+        <div class="nav-wrapper">
+            <div class="logo-container">
+                <img src="logo.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
+            </div>
+            <div class="nav-container">
+                <div class="nav-item" id="btn-emp" onclick="switchTab('emplacement', this)">Emplacement</div>
+                <div class="nav-item" onclick="switchTab('allee', this)">Allée</div>
+                <div class="nav-item" onclick="switchTab('badge', this)">Badge</div>
+                <div class="nav-item" onclick="switchTab('etoile', this)">Emplacement étoile</div>
+            </div>
         </div>
     </nav>
 
@@ -91,7 +104,7 @@
     <div id="print-zone"></div>
 
     <script>
-        let currentTab = 'emplacement';
+        let currentTab = '';
         let subMode = 'single';
         const PIN_CODE = "2462";
         const SIGNATURE = "Najmkh";
@@ -105,17 +118,22 @@
                 single: `<div class="grid-inputs"><div class="field"><label>Zone</label><input type="number" id="z"></div><div class="field"><label>Allée</label><input type="number" id="a"></div></div>`,
                 mass: `<div class="grid-inputs"><div class="field"><label>Zone</label><input type="number" id="z"></div><div class="field"><label>Allées de</label><input type="number" id="a_start"></div><div class="field"><label>à</label><input type="number" id="a_end"></div></div>`
             },
-            badge: `<div class="field" style="margin-bottom:10px;"><label>Nom Opérateur</label><input type="text" id="b_name"></div><div class="field"><label>N° Badge (4 chiffres)</label><input type="number" id="b_id"></div>`,
+            badge: `<div class="field" style="margin-bottom:10px;"><label>Nom Opérateur</label><input type="text" id="b_name"></div><div class="field"><label>N° Badge</label><input type="number" id="b_id"></div>`,
             etoile: `<div class="field"><label>Code à encoder</label><input type="text" id="star_code"></div>`
         };
 
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
         function switchTab(tab, el) {
             if (tab === 'etoile') {
-                if (prompt("PIN :") !== PIN_CODE) return alert("Refusé");
+                if (prompt("PIN :") !== PIN_CODE) return alert("Refusé.");
             }
             currentTab = tab;
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
+            document.getElementById('tab-title').innerText = el.innerText;
             document.getElementById('mode-ui').style.display = (tab==='emplacement' || tab==='allee') ? 'flex' : 'none';
             setSubMode('single');
         }
@@ -141,7 +159,6 @@
         async function generate() {
             const pz = document.getElementById('print-zone');
             pz.innerHTML = '';
-            pz.style.gridTemplateColumns = "";
             let tasks = [];
 
             if (currentTab === 'emplacement') {
@@ -187,7 +204,7 @@
                     const zF = ("0"+t.z).slice(-2), aF = ("0"+t.a).slice(-2);
                     const configs = [
                         {id:`${i}AZ`, c:`20330000${zF}${aF}`, t:`Area ${t.z} Room ${t.a}`, dir: 'A ➔ Z'},
-                        {id:`${i}ZA`, c:`20330100${zF}${aF}`, t:`Area ${t.z} Room ${t.a}`, dir: 'Z ➔ A'}
+                        {id:`${i}ZA`, c:`20330100${zF}${aF}`, t:`Area ${t.z} Room ${aF}`, dir: 'Z ➔ A'}
                     ];
                     for (let conf of configs) {
                         let full = conf.c + getCheckDigit(conf.c);
@@ -222,7 +239,10 @@
             document.getElementById('btnPrint').style.display = 'block';
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
-        window.onload = () => setSubMode('single');
+
+        window.onload = () => {
+            switchTab('emplacement', document.getElementById('btn-emp'));
+        };
     </script>
 </body>
 </html>
