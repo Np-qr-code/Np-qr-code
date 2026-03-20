@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PharmaLogix Pro - Système Complet</title>
+    <title>PharmaLogix Pro - Mass Generator</title>
     <script src="https://cdn.jsdelivr.net/npm/bwip-js@3.0.4/dist/bwip-js-min.js"></script>
     <style>
         :root { --primary: #000; --accent: #2563eb; --bg: #f2f2f7; --card: #fff; --sub: #8e8e93; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; display: flex; flex-direction: column; align-items: center; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding-bottom: 80px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; position: relative; }
         
         nav { width: 100%; background: var(--card); padding: 15px 0; display: flex; justify-content: center; border-bottom: 0.5px solid #d1d1d6; position: sticky; top: 0; z-index: 100; }
         .nav-container { width: 95%; max-width: 600px; display: flex; background: #e3e3e6; padding: 4px; border-radius: 10px; gap: 2px; }
@@ -31,9 +31,17 @@
         .btn-print { background: #34c759; color: #fff; display: none; margin-top: 15px; width: 100%; padding: 16px; border-radius: 14px; border: none; font-weight: 700; }
         
         #print-zone { display: grid; gap: 15px; justify-content: center; width: fit-content; margin: 30px auto; }
-        .label-style { display: flex; width: 1.5in; height: 1in; background: #fff; border: 1px solid #ccc; flex-direction: column; justify-content: center; align-items: center; padding: 0.05in; box-sizing: border-box; }
         
-        /* Styles spécifiques pour les textes des allées */
+        /* --- ÉTIQUETTE AVEC SIGNATURE --- */
+        .label-style { 
+            display: flex; width: 1.5in; height: 1in; background: #fff; border: 1px solid #ccc; 
+            flex-direction: column; justify-content: center; align-items: center; 
+            padding: 0.05in; box-sizing: border-box; position: relative;
+        }
+        
+        /* Signature sur l'étiquette */
+        .label-signature { position: absolute; bottom: 2px; right: 5px; font-size: 5pt; color: #bbb; font-style: italic; font-family: serif; }
+
         .txt-row1 { font-size: 10pt; font-weight: bold; }
         .txt-row2 { font-size: 14pt; font-weight: bold; margin: 2px 0; }
         
@@ -41,15 +49,22 @@
         .txt-box-emp { width: 100%; height: 0.35in; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18pt; color: #000; }
         canvas { max-height: 100%; max-width: 95%; image-rendering: pixelated; }
 
+        /* --- SIGNATURE SUR LE SITE --- */
+        .site-footer-signature { position: fixed; bottom: 15px; right: 15px; font-size: 14px; color: var(--sub); font-style: italic; opacity: 0.7; z-index: 999; pointer-events: none; }
+
         @media print {
-            .no-print, nav, .container { display: none !important; }
+            .no-print, nav, .container, .site-footer-signature { display: none !important; }
             #print-zone { display: block !important; margin-top: 0; width: 100%; }
             .label-style { display: flex !important; border: none !important; width: 1.5in !important; height: 1in !important; margin: 0; page-break-after: always; }
+            /* On garde la signature sur l'étiquette à l'impression si tu veux, ou on l'enlève */
+            .label-signature { color: #000 !important; opacity: 0.3; } 
             @page { size: 1.5in 1in; margin: 0; }
         }
     </style>
 </head>
 <body>
+    <div class="site-footer-signature no-print">Najmkh</div>
+
     <nav class="no-print">
         <div class="nav-container">
             <div class="nav-item active" onclick="switchTab('emplacement', this)">Emplacement</div>
@@ -79,6 +94,7 @@
         let currentTab = 'emplacement';
         let subMode = 'single';
         const PIN_CODE = "2462";
+        const SIGNATURE = "Najmkh";
 
         const forms = {
             emplacement: {
@@ -89,7 +105,7 @@
                 single: `<div class="grid-inputs"><div class="field"><label>Zone</label><input type="number" id="z"></div><div class="field"><label>Allée</label><input type="number" id="a"></div></div>`,
                 mass: `<div class="grid-inputs"><div class="field"><label>Zone</label><input type="number" id="z"></div><div class="field"><label>Allées de</label><input type="number" id="a_start"></div><div class="field"><label>à</label><input type="number" id="a_end"></div></div>`
             },
-            badge: `<div class="field" style="margin-bottom:10px;"><label>Nom Opérateur</label><input type="text" id="b_name"></div><div class="field"><label>N° Badge</label><input type="number" id="b_id"></div>`,
+            badge: `<div class="field" style="margin-bottom:10px;"><label>Nom Opérateur</label><input type="text" id="b_name"></div><div class="field"><label>N° Badge (4 chiffres)</label><input type="number" id="b_id"></div>`,
             etoile: `<div class="field"><label>Code à encoder</label><input type="text" id="star_code"></div>`
         };
 
@@ -152,7 +168,7 @@
                     let base = parseInt((t.z == '0' ? '2030' : '21' + ('0' + t.z).slice(-2)) + '00000000') + (parseInt(t.a) * 1000000) + (t.etg.charCodeAt(0)-64)*10000 + (parseInt(t.niv)*100) + (t.pl.charCodeAt(0)-64);
                     let fullCode = base.toString() + getCheckDigit(base);
                     let label = document.createElement('div'); label.className = 'label-style';
-                    label.innerHTML = `<div class="bc-box" style="height:0.7in;"><canvas id="c-emp-${i}"></canvas></div><div class="txt-box-emp">${t.z}-${t.a}${t.etg}${t.niv}${t.pl}</div>`;
+                    label.innerHTML = `<div class="bc-box" style="height:0.7in;"><canvas id="c-emp-${i}"></canvas></div><div class="txt-box-emp">${t.z}-${t.a}${t.etg}${t.niv}${t.pl}</div><div class="label-signature">${SIGNATURE}</div>`;
                     pz.appendChild(label);
                     bwipjs.toCanvas(`c-emp-${i}`, { bcid:'datamatrix', text:fullCode, scale:10, padding:2 });
                 }
@@ -176,20 +192,21 @@
                     for (let conf of configs) {
                         let full = conf.c + getCheckDigit(conf.c);
                         let div = document.createElement('div'); div.className = 'label-style';
-                        div.innerHTML = `<div class="txt-row1">${conf.t}</div><div class="txt-row2">${conf.dir}</div><div class="bc-box" style="height:0.55in;"><canvas id="ca-${conf.id}"></canvas></div>`;
+                        div.innerHTML = `<div class="txt-row1">${conf.t}</div><div class="txt-row2">${conf.dir}</div><div class="bc-box" style="height:0.55in;"><canvas id="ca-${conf.id}"></canvas></div><div class="label-signature">${SIGNATURE}</div>`;
                         pz.appendChild(div);
                         bwipjs.toCanvas(`ca-${conf.id}`, { bcid:'code128', text:full, scale:2.5, height:12, includetext:true, textsize:8, textxalign:'center'});
                     }
                 }
             }
             else if (currentTab === 'badge') {
-                const n = document.getElementById('b_name').value, id = document.getElementById('b_id').value;
-                if(!n || !id) return alert("Champs vides !");
+                const nameIn = document.getElementById('b_name').value, idIn = document.getElementById('b_id').value;
+                if(!idIn) return alert("N° Badge obligatoire !");
+                const displayName = nameIn.trim() !== "" ? nameIn : idIn;
                 pz.style.gridTemplateColumns = "1.6in";
-                const full = "20320000" + ("000"+id).slice(-4);
+                const full = "20320000" + ("000"+idIn).slice(-4);
                 const code = full + getCheckDigit(full);
                 let div = document.createElement('div'); div.className = 'label-style';
-                div.innerHTML = `<div style="font-size:14pt; border-bottom:1px solid #000; width:95%; height:0.4in; display:flex; align-items:center; justify-content:center; font-weight:bold; text-transform:uppercase;">${n}</div><div class="bc-box" style="height:0.6in;"><canvas id="c-badge"></canvas></div>`;
+                div.innerHTML = `<div style="font-size:14pt; border-bottom:1px solid #000; width:95%; height:0.4in; display:flex; align-items:center; justify-content:center; font-weight:bold; text-transform:uppercase;">${displayName}</div><div class="bc-box" style="height:0.6in;"><canvas id="c-badge"></canvas></div><div class="label-signature">${SIGNATURE}</div>`;
                 pz.appendChild(div);
                 bwipjs.toCanvas('c-badge', { bcid:'code128', text:code, scale:2.2, height:12, includetext:true, textsize:9, textxalign:'center'});
             }
@@ -198,7 +215,7 @@
                 if(!sc) return alert("Champs vides !");
                 pz.style.gridTemplateColumns = "1.6in";
                 let div = document.createElement('div'); div.className = 'label-style';
-                div.innerHTML = `<div class="bc-box" style="height:1in;"><canvas id="c-star"></canvas></div>`;
+                div.innerHTML = `<div class="bc-box" style="height:1in;"><canvas id="c-star"></canvas></div><div class="label-signature">${SIGNATURE}</div>`;
                 pz.appendChild(div);
                 bwipjs.toCanvas('c-star', { bcid:'code128', text:sc, scale:3, height:20, includetext:true, textsize:10 });
             }
