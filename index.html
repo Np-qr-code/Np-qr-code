@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PharmaLogix Pro - Système Intégral</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PharmaLogix Pro - Mobile & Desktop</title>
     <script src="https://cdn.jsdelivr.net/npm/bwip-js@3.0.4/dist/bwip-js-min.js"></script>
     <style>
         :root { 
@@ -14,42 +14,42 @@
             --bg: #1c1c1e; --card: #2c2c2e; --sub: #aeaeb2; --text: #ffffff; --nav-bg: #3a3a3c; --primary: #ffffff;
         }
 
-        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 90px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; position: relative; transition: background 0.3s, color 0.3s; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 90px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; position: relative; transition: background 0.3s, color 0.3s; overflow-x: hidden; }
         
-        nav { width: 100%; background: var(--card); padding: 15px 0; display: flex; align-items: center; justify-content: center; border-bottom: 0.5px solid #d1d1d6; position: sticky; top: 0; z-index: 100; }
-        .nav-wrapper { width: 95%; max-width: 1200px; display: flex; align-items: center; justify-content: center; position: relative; }
+        /* NAVIGATION ADAPTATIVE */
+        nav { width: 100%; background: var(--card); padding: 10px 0; display: flex; align-items: center; justify-content: center; border-bottom: 0.5px solid #d1d1d6; position: sticky; top: 0; z-index: 100; }
+        .nav-wrapper { width: 95%; max-width: 1200px; display: flex; align-items: center; justify-content: space-between; position: relative; gap: 10px; }
         
-        .logo-container { position: absolute; left: 0; top: 50%; transform: translateY(-50%); display: flex; align-items: center; }
-        .logo-img { height: 50px; width: auto; border-radius: 8px; } 
+        .logo-img { height: 40px; width: auto; border-radius: 6px; } 
 
-        .nav-container { display: flex; background: var(--nav-bg); padding: 5px; border-radius: 12px; gap: 4px; min-width: 500px; }
-        .nav-item { flex: 1; text-align: center; cursor: pointer; font-weight: 700; font-size: 11px; padding: 10px 0; border-radius: 8px; text-transform: uppercase; color: var(--sub); white-space: nowrap; transition: 0.2s; }
-        .nav-item.active { background: var(--card); box-shadow: 0 4px 10px rgba(0,0,0,0.1); color: var(--text); }
+        .nav-container { display: flex; background: var(--nav-bg); padding: 4px; border-radius: 10px; gap: 2px; flex: 1; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .nav-item { flex: 1; text-align: center; cursor: pointer; font-weight: 700; font-size: 10px; padding: 10px 8px; border-radius: 8px; text-transform: uppercase; color: var(--sub); white-space: nowrap; transition: 0.2s; min-width: 80px; }
+        .nav-item.active { background: var(--card); box-shadow: 0 2px 8px rgba(0,0,0,0.1); color: var(--text); }
         
-        .container { width: 90%; max-width: 580px; margin-top: 40px; }
-        .card { background: var(--card); border-radius: 25px; padding: 30px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); margin-bottom: 30px; }
-        #tab-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; text-transform: uppercase; text-align: center; }
+        /* CONTENEUR PRINCIPAL */
+        .container { width: 92%; max-width: 580px; margin-top: 20px; }
+        .card { background: var(--card); border-radius: 20px; padding: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        #tab-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 15px; text-transform: uppercase; text-align: center; }
 
-        .mode-selector { display: flex; background: var(--bg); padding: 4px; border-radius: 10px; margin-bottom: 25px; gap: 4px; }
-        .mode-btn { flex: 1; border: none; padding: 10px; font-size: 13px; font-weight: 800; border-radius: 8px; cursor: pointer; background: none; color: var(--sub); text-transform: uppercase; }
-        .mode-btn.active { background: var(--card); color: var(--text); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .mode-selector { display: flex; background: var(--bg); padding: 4px; border-radius: 10px; margin-bottom: 20px; gap: 4px; }
+        .mode-btn { flex: 1; border: none; padding: 10px; font-size: 12px; font-weight: 800; border-radius: 8px; cursor: pointer; background: none; color: var(--sub); text-transform: uppercase; }
+        .mode-btn.active { background: var(--card); color: var(--text); box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
 
-        .area-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; margin-bottom: 20px; }
-        .area-btn { background: var(--bg); border: 1.5px solid var(--sub); color: var(--text); padding: 12px; border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer; transition: 0.2s; text-align: center; }
-        .area-btn:hover { border-color: var(--accent); }
+        /* GRILLE AREA */
+        .area-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 20px; }
+        .area-btn { background: var(--bg); border: 1px solid var(--sub); color: var(--text); padding: 12px 5px; border-radius: 8px; font-weight: 700; font-size: 11px; cursor: pointer; transition: 0.2s; text-align: center; }
         .area-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-        .grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        .field { display: flex; flex-direction: column; gap: 8px; }
-        label { font-size: 11px; font-weight: 800; color: var(--sub); text-transform: uppercase; letter-spacing: 0.8px; }
-        input { padding: 16px; border: 1.5px solid var(--sub); border-radius: 12px; font-size: 16px; outline: none; background: var(--bg); color: var(--text); width: 100%; box-sizing: border-box; }
+        /* INPUTS */
+        .grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .field { display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 10px; font-weight: 800; color: var(--sub); text-transform: uppercase; }
+        input { padding: 14px; border: 1.5px solid var(--sub); border-radius: 10px; font-size: 16px; outline: none; background: var(--bg); color: var(--text); width: 100%; box-sizing: border-box; -webkit-appearance: none; }
         
-        /* Bouton Imprimer mis en valeur */
-        .btn-print { background: #34c759; color: #fff; display: none; margin-top: 15px; width: 100%; padding: 20px; border-radius: 18px; border: none; font-weight: 800; font-size: 18px; text-transform: uppercase; cursor: pointer; animation: fadeIn 0.3s ease; }
+        .btn-print { background: #34c759; color: #fff; display: none; margin-top: 15px; width: 100%; padding: 18px; border-radius: 14px; border: none; font-weight: 800; font-size: 16px; text-transform: uppercase; cursor: pointer; }
         
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        #print-zone { display: grid; gap: 40px; justify-content: center; width: fit-content; margin: 60px auto; }
+        /* ZONE D'IMPRESSION / APERÇU */
+        #print-zone { display: grid; gap: 30px; justify-content: center; width: 100%; margin: 40px auto; padding-bottom: 40px; }
 
         .label-style { 
             display: flex; width: 1.5in; height: 1in; background: #fff !important; border: 1px solid #ccc; 
@@ -64,8 +64,20 @@
         .txt-row2 { font-size: 14pt; font-weight: bold; margin: 2px 0; }
         canvas { max-height: 100%; max-width: 95%; image-rendering: pixelated; }
 
-        .theme-toggle { position: fixed; bottom: 30px; left: 30px; width: 55px; height: 55px; background: var(--card); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 8px 20px rgba(0,0,0,0.2); z-index: 1000; border: 1px solid var(--sub); font-size: 26px; }
-        .site-footer-signature { position: fixed; bottom: 30px; right: 30px; font-size: 16px; color: var(--sub); font-style: italic; font-weight: 600; opacity: 0.8; }
+        /* BOUTONS FLOTTANTS */
+        .theme-toggle { position: fixed; bottom: 20px; left: 20px; width: 50px; height: 50px; background: var(--card); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; border: 1px solid var(--sub); font-size: 22px; }
+        .site-footer-signature { position: fixed; bottom: 20px; right: 20px; font-size: 14px; color: var(--sub); font-style: italic; font-weight: 600; opacity: 0.8; }
+
+        /* --- RESPONSIVE MOBILE --- */
+        @media (max-width: 600px) {
+            .nav-wrapper { flex-direction: column; gap: 10px; padding: 5px 0; }
+            .logo-container { position: static; transform: none; }
+            .nav-container { width: 100%; min-width: unset; }
+            .area-grid { grid-template-columns: repeat(3, 1fr); }
+            .grid-inputs { grid-template-columns: 1fr; } /* Inputs un par un sur mobile */
+            .label-style { transform: scale(1.1); } /* Un peu moins zoomé sur mobile */
+            #print-zone { gap: 20px; margin: 30px auto; }
+        }
 
         @media print {
             .no-print, nav, .container, .site-footer-signature, .theme-toggle { display: none !important; }
@@ -86,10 +98,10 @@
                 <img src="logo.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
             </div>
             <div class="nav-container">
-                <div class="nav-item" id="btn-emp" onclick="switchTab('emplacement', this)">Emplacement</div>
+                <div id="btn-emp" class="nav-item" onclick="switchTab('emplacement', this)">Emplacement</div>
                 <div class="nav-item" onclick="switchTab('allee', this)">Allée</div>
                 <div class="nav-item" onclick="switchTab('badge', this)">Badge</div>
-                <div class="nav-item" onclick="switchTab('etoile', this)">Emplacement étoile</div>
+                <div class="nav-item" onclick="switchTab('etoile', this)">Étoile</div>
             </div>
         </div>
     </nav>
@@ -111,7 +123,7 @@
             <div id="form-container"></div>
 
             <button id="btnPrint" class="btn-print" onclick="window.print()">IMPRIMER </button>
-            <button onclick="location.reload()" style="background:none; color:var(--sub); border:none; width:100%; margin-top:15px; font-size:13px; cursor:pointer; font-weight: 600;">Réinitialiser</button>
+            <button onclick="location.reload()" style="background:none; color:var(--sub); border:none; width:100%; margin-top:15px; font-size:12px; cursor:pointer; font-weight: 600;">Réinitialiser</button>
         </div>
     </div>
 
@@ -128,15 +140,15 @@
 
         const forms = {
             emplacement: {
-                single: `<div class="grid-inputs"><div class="field"><label>Allée</label><input type="number" id="a"></div><div class="field"><label>Étagère</label><input type="text" id="etg" maxlength="1"></div><div class="field"><label>Étage</label><input type="number" id="niv"></div><div class="field"><label>Place</label><input type="text" id="pl" maxlength="1"></div></div>`,
-                mass: `<div class="grid-inputs"><div class="field" style="grid-column: span 2;"><label>Allée</label><input type="number" id="a"></div><div class="field"><label>Étagère de</label><input type="text" id="etg_start" maxlength="1"></div><div class="field"><label>à</label><input type="text" id="etg_end" maxlength="1"></div><div class="field"><label>Nb Étages</label><input type="number" id="niv_max"></div><div class="field"><label>Place de A à...</label><input type="text" id="pl_end" maxlength="1"></div></div>`
+                single: `<div class="grid-inputs"><div class="field"><label>Allée</label><input type="number" id="a" placeholder="00"></div><div class="field"><label>Étagère</label><input type="text" id="etg" maxlength="1" placeholder="A"></div><div class="field"><label>Étage</label><input type="number" id="niv" placeholder="1"></div><div class="field"><label>Place</label><input type="text" id="pl" maxlength="1" placeholder="A"></div></div>`,
+                mass: `<div class="grid-inputs"><div class="field" style="grid-column: 1 / -1;"><label>Allée</label><input type="number" id="a" placeholder="00"></div><div class="field"><label>Étagère de</label><input type="text" id="etg_start" maxlength="1" placeholder="A"></div><div class="field"><label>à</label><input type="text" id="etg_end" maxlength="1" placeholder="D"></div><div class="field"><label>Nb Étages</label><input type="number" id="niv_max" placeholder="2"></div><div class="field"><label>Place de A à...</label><input type="text" id="pl_end" maxlength="1" placeholder="B"></div></div>`
             },
             allee: {
-                single: `<div class="field"><label>Numéro d'allée</label><input type="number" id="a"></div>`,
-                mass: `<div class="grid-inputs"><div class="field"><label>Allées de</label><input type="number" id="a_start"></div><div class="field"><label>à</label><input type="number" id="a_end"></div></div>`
+                single: `<div class="field"><label>Numéro d'allée</label><input type="number" id="a" placeholder="00"></div>`,
+                mass: `<div class="grid-inputs"><div class="field"><label>De</label><input type="number" id="a_start" placeholder="01"></div><div class="field"><label>À</label><input type="number" id="a_end" placeholder="10"></div></div>`
             },
-            badge: `<div class="field" style="margin-bottom:20px;"><label>Nom Opérateur</label><input type="text" id="b_name"></div><div class="field"><label>N° Badge (Matricule)</label><input type="number" id="b_id"></div>`,
-            etoile: `<div class="field"><label>Code à encoder (Code 128)</label><input type="text" id="star_code"></div>`
+            badge: `<div class="field" style="margin-bottom:20px;"><label>Nom Opérateur</label><input type="text" id="b_name" placeholder="NOM"></div><div class="field"><label>N° Badge</label><input type="number" id="b_id" placeholder="1234"></div>`,
+            etoile: `<div class="field"><label>Code libre</label><input type="text" id="star_code" placeholder="TEXTE"></div>`
         };
 
         function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
@@ -160,7 +172,7 @@
 
         function switchTab(tab, el) {
             if (tab === 'etoile') {
-                if (prompt("Veuillez saisir le code PIN :") !== PIN_CODE) return alert("Accès refusé.");
+                if (prompt("PIN :") !== PIN_CODE) return alert("Refusé.");
             }
             currentTab = tab;
             selectedArea = null;
@@ -196,9 +208,8 @@
             const allFilled = inputs.every(i => i.value.trim() !== "");
             const areaOk = (currentTab === 'emplacement' || currentTab === 'allee') ? selectedArea !== null : true;
 
-            if (allFilled && areaOk) {
-                generate(true);
-            } else {
+            if (allFilled && areaOk) generate(true);
+            else {
                 document.getElementById('print-zone').innerHTML = '';
                 document.getElementById('btnPrint').style.display = 'none';
             }
@@ -223,12 +234,10 @@
                     const a = document.getElementById('a').value, etg = document.getElementById('etg').value.toUpperCase(), niv = document.getElementById('niv').value, pl = document.getElementById('pl').value.toUpperCase();
                     if(!a || !etg || !niv || !pl) return;
                     tasks.push({ z: selectedArea, a, etg, niv, pl });
-                    pz.style.gridTemplateColumns = "2.2in";
                 } else {
                     const a = document.getElementById('a').value, es = document.getElementById('etg_start').value, ee = document.getElementById('etg_end').value, nMax = parseInt(document.getElementById('niv_max').value), pe = document.getElementById('pl_end').value;
                     if(!a || !es || !ee || isNaN(nMax) || !pe) return;
                     const s = es.toUpperCase().charCodeAt(0), e = ee.toUpperCase().charCodeAt(0), pMax = pe.toUpperCase().charCodeAt(0);
-                    pz.style.gridTemplateColumns = `repeat(${pMax - 64}, 2.2in)`;
                     for (let ie = s; ie <= e; ie++) {
                         for (let iniv = 1; iniv <= nMax; iniv++) {
                             for (let ip = 65; ip <= pMax; ip++) {
@@ -257,7 +266,6 @@
                     if(isNaN(start) || isNaN(end)) return;
                     for(let i=start; i<=end; i++) list.push({z: selectedArea, a: i});
                 }
-                pz.style.gridTemplateColumns = "repeat(2, 2.2in)";
                 for (let i=0; i < list.length; i++) {
                     let t = list[i];
                     const zF = ("0"+t.z).slice(-2), aF = ("0"+t.a).slice(-2);
@@ -275,7 +283,6 @@
                 const nIn = document.getElementById('b_name').value, idIn = document.getElementById('b_id').value;
                 if(!idIn) return;
                 const disp = nIn.trim() !== "" ? nIn : idIn;
-                pz.style.gridTemplateColumns = "2.2in";
                 const base = "20320000" + ("000"+idIn).slice(-4);
                 const full = base + getCheckDigit(base);
                 let div = document.createElement('div'); div.className = 'label-style';
@@ -286,7 +293,6 @@
             else if (currentTab === 'etoile') {
                 const sc = document.getElementById('star_code').value;
                 if(!sc) return;
-                pz.style.gridTemplateColumns = "2.2in";
                 let div = document.createElement('div'); div.className = 'label-style';
                 div.innerHTML = `<div style="height:0.9in; display:flex; align-items:center;"><canvas id="c-s"></canvas></div><div class="label-signature">${SIGNATURE}</div>`;
                 pz.appendChild(div);
